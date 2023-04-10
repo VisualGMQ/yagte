@@ -1,7 +1,7 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 pub trait Arithmetic<T>:
-    Neg
+    Neg<Output = T>
     + Add<T, Output = T>
     + Sub<T, Output = T>
     + Mul<T, Output = T>
@@ -14,7 +14,7 @@ pub trait Arithmetic<T>:
 }
 
 impl<T> Arithmetic<T> for T where
-    T: Neg
+    T: Neg<Output = T>
         + Add<T, Output = T>
         + Sub<T, Output = T>
         + Mul<T, Output = T>

@@ -1,2 +1,2 @@
 mod arithmetic;
-pub mod math;
+pub mod matrix;
