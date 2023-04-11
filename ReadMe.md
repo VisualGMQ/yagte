@@ -6,9 +6,9 @@ Yet Another Geometric Tool
 
 ## 目前的进度
 
-* :no_entry_sign: : 编写完成，未测试
+* :o: : 编写完成，未测试
 * :heavy_check_mark: : 编写完成，测试通过
-* :o: : 无需完成
+* :no_entry_sign: : 无需完成
 
 2D求最短距离：
 
