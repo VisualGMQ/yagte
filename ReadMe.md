@@ -6,16 +6,16 @@ Yet Another Geometric Tool
 
 ## 目前的进度
 
-* ✔ : 编写完成，未测试
-* ✔️: 编写完成，测试通过
-* 🚫: 无需完成
+* :no_entry_sign: : 编写完成，未测试
+* :heavy_check_mark: : 编写完成，测试通过
+* :o: : 无需完成
 
 2D求最短距离：
 
 ||Point|Line|Segment|Ray|Triangle|Polyline|Polygon|
 |:-|:--:|:--:|:-----:|:--:|:------:|:------:|:-----:|
-|Point|✔|️✔|️✔|️✔|✔|️✔|
-|Line||✔||✔|||
+|Point|:o:|:o:|:o:|:o:|:o:|:o:|
+|Line||:o:||:o:|||
 |Segment|||||||
 |Ray|||||||
 |Triangle|||||||
@@ -27,7 +27,7 @@ Yet Another Geometric Tool
 
 ||Point|Line|Segment|Ray|Triangle|Rect|Polyline|Polygon|
 |:-|:--:|:--:|:-----:|:--:|:------:|:--:|:------:|:-----:|
-|Point|🚫|✔|✔|✔||✔|
+|Point|:no_entry_sign:|:o:|:o:|:o:||:o:|
 |Line|||||||
 |Segment|||||||
 |Ray|||||||
@@ -40,7 +40,7 @@ Yet Another Geometric Tool
 
 ||Point|Line|Segment|Ray|Triangle|Rect|Polyline|Polygon|
 |:-|:--:|:--:|:-----:|:--:|:------:|:--:|:------:|:-----:|
-|Point|🚫||||||
+|Point|:no_entry_sign:||||||
 |Line|||||||
 |Segment|||||||
 |Ray|||||||
@@ -53,4 +53,4 @@ Yet Another Geometric Tool
 
 |Point|Line|Segment|Ray|Triangle|Rect|Polyline|Polygon|
 |:--:|:--:|:-----:|:--:|:------:|:--:|:------:|:-----:|
-|🚫|||||✔|
+|:no_entry_sign:|||||:o:|
