@@ -8,12 +8,17 @@ pub fn pt2pt_sqrd(pt1: &Vec2, pt2: &Vec2) -> f64 {
 
 pub fn pt2line_sqrd(pt: &Vec2, line: &Line) -> f64 {
     let p = pt2line(pt, line);
-    pt2pt_sqrd(&p, line.start())
+    pt2pt_sqrd(&p, pt)
+}
+
+pub fn pt2seg_sqrd(pt: &Vec2, seg: &Line) -> f64 {
+    let p = pt2segment(pt, seg);
+    pt2pt_sqrd(&p, pt)
 }
 
 pub fn pt2ray_sqrd(pt: &Vec2, line: &Line) -> f64 {
     let p = pt2ray(pt, line);
-    pt2pt_sqrd(&p, line.start())
+    pt2pt_sqrd(&p, pt)
 }
 
 pub fn pt2polyline_sqrd(pt: &Vec2, polyline: &[Vec2]) -> Option<f64> {
