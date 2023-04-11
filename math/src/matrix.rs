@@ -1,6 +1,5 @@
 use std::ops::{
-    Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub,
-    SubAssign,
+    Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
 };
 
 use crate::arithmetic::*;
@@ -27,6 +26,10 @@ impl<T: ArithmeticGroup<T>, const COL: usize, const ROW: usize> Matrix<T, COL, R
         result
     }
 
+    pub fn from_row_vecs(rows: &[RowVector<T, COL>; ROW]) -> Self {
+        Matrix::<T, ROW, COL>::from_col_vecs(&rows.map(|row| row.transpose())).transpose()
+    }
+
     pub fn from_col(datas: &[T]) -> Self {
         let mut result = Self::zeros();
         let mut i = 0usize;
@@ -35,6 +38,12 @@ impl<T: ArithmeticGroup<T>, const COL: usize, const ROW: usize> Matrix<T, COL, R
             i += 1;
         }
         result
+    }
+
+    pub fn from_col_vecs(rows: &[ColVector<T, ROW>; COL]) -> Self {
+        Self {
+            data: std::array::from_fn(|i| rows[i].to_array()),
+        }
     }
 
     pub fn zeros() -> Self {
@@ -281,6 +290,7 @@ pub type Mat33 = Matrix<f64, 3, 3>;
 pub type Mat44 = Matrix<f64, 4, 4>;
 
 pub type ColVector<T, const LEN: usize> = Matrix<T, 1, LEN>;
+pub type RowVector<T, const LEN: usize> = Matrix<T, LEN, 1>;
 
 impl<T: ArithmeticGroup<T>, const LEN: usize> ColVector<T, LEN> {
     pub fn new(datas: [T; LEN]) -> Self {
@@ -302,6 +312,10 @@ impl<T: ArithmeticGroup<T>, const LEN: usize> ColVector<T, LEN> {
             sum += self[i] * rhs[i];
         }
         sum
+    }
+
+    pub fn to_array(&self) -> [T; LEN] {
+        self.data[0]
     }
 }
 

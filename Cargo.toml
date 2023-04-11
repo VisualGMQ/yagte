@@ -7,6 +7,10 @@ readme = "ReadMe.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+log = "0.4.0"
+graphics = { path = "./graphics" }
+geometric = { path = "./geometric" }
+math = { path = "./math" }
 
 [workspace]
-members = [ "yagt_*" ]
+members = [ "graphics", "geometric", "math" ]
