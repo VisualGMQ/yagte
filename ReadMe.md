@@ -12,7 +12,7 @@ Yet Another Geometric Tool
 
 2D求最短距离：
 
-|🌚|Point|Line|Segment|Ray|Triangle|Polyline|Polygon|
+||Point|Line|Segment|Ray|Triangle|Polyline|Polygon|
 |:-|:--:|:--:|:-----:|:--:|:------:|:------:|:-----:|
 |Point|✔|️✔|️✔|️✔|✔|️✔|
 |Line||✔||✔|||
@@ -25,7 +25,7 @@ Yet Another Geometric Tool
 
 2D几何体之间的最近点：
 
-|🌚|Point|Line|Segment|Ray|Triangle|Rect|Polyline|Polygon|
+||Point|Line|Segment|Ray|Triangle|Rect|Polyline|Polygon|
 |:-|:--:|:--:|:-----:|:--:|:------:|:--:|:------:|:-----:|
 |Point|🚫|✔|✔|✔||✔|
 |Line|||||||
@@ -38,7 +38,7 @@ Yet Another Geometric Tool
 
 2D几何体之间的相交判断：
 
-|🌚|Point|Line|Segment|Ray|Triangle|Rect|Polyline|Polygon|
+||Point|Line|Segment|Ray|Triangle|Rect|Polyline|Polygon|
 |:-|:--:|:--:|:-----:|:--:|:------:|:--:|:------:|:-----:|
 |Point|🚫||||||
 |Line|||||||
