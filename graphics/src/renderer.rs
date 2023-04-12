@@ -1,71 +1,31 @@
+use crate::buffer::*;
+use crate::gl_call;
+use crate::glhelper::GLResult;
+use crate::vertex_attr::*;
 use gl;
-use log;
 use math;
-
-#[derive(Debug, PartialEq)]
-pub enum GLError {
-    NoError = 0,
-    InvalidEnum,
-    InvalidValue,
-    InvalidOperation,
-    InvalidFramebufferOperation,
-    OutOfMemory,
-    StackUnderflow,
-    OverFlow,
-    Unknown,
-}
-
-fn gl_get_top_error() -> GLError {
-    unsafe {
-        let err = gl::GetError();
-        if err >= GLError::Unknown as u32 {
-            GLError::Unknown
-        } else {
-            std::mem::transmute(err as u8)
-        }
-    }
-}
-
-fn gl_clear_error() {
-    const MAX_LOOP_COUNT: u32 = 1000;
-    let mut i = 0;
-    let mut err = gl_get_top_error();
-    while i < MAX_LOOP_COUNT && err != GLError::NoError {
-        err = gl_get_top_error();
-        i += 1
-    }
-}
-
-fn gl_get_error() -> GLError {
-    gl_clear_error();
-    gl_get_top_error()
-}
-
-macro_rules! gl_call {
-    ($expr: expr) => {
-        unsafe {
-            gl_clear_error();
-            let result = $expr;
-            let error = gl_get_error();
-            if error == GLError::NoError {
-                Ok(result)
-            } else {
-                log::error!(target: "OpenGL", "Occured Error: {:?}", error);
-                Err(error)
-            }
-        }
-    };
-}
 
 pub struct Renderer {
     color: math::cg::Color,
+    vao: VertexAttribute,
+    vbo: Buffer,
+    ebo: Buffer,
 }
 
 impl Renderer {
-    pub fn new() -> Self {
-        Self {
+    pub fn new() -> GLResult<Self> {
+        let mut bunch = AttrBunch::new();
+        bunch.add(Attribute {
+            attrib_type: AttribType::Float,
+            count: 2,
+        });
+
+        Ok(Self {
             color: math::cg::Color::white(),
-        }
+            vao: VertexAttribute::new(&bunch)?,
+            vbo: Buffer::new(BufferType::ArrayBuffer)?,
+            ebo: Buffer::new(BufferType::ElementBuffer)?,
+        })
     }
 
     pub fn set_clear_color(&mut self, color: math::cg::Color) {
@@ -84,5 +44,11 @@ impl Renderer {
             gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT | gl::STENCIL_BUFFER_BIT
         ))
         .unwrap();
+    }
+
+    pub fn cleanup(&mut self) {
+        drop(&mut self.ebo);
+        drop(&mut self.vbo);
+        drop(&mut self.vao);
     }
 }

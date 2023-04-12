@@ -10,7 +10,7 @@ fn main() {
     let window = WindowBuilder::new().with_title("Learn OpenGL with Rust");
 
     let gl_context = ContextBuilder::new()
-        .with_gl(GlRequest::Specific(Api::OpenGl, (3, 3)))
+        .with_gl(GlRequest::Specific(Api::OpenGl, (4, 5)))
         .build_windowed(window, &event_loop)
         .expect("Cannot create windowed context");
 
@@ -22,7 +22,7 @@ fn main() {
 
     gl::load_with(|ptr| gl_context.get_proc_address(ptr) as *const _);
 
-    let mut renderer = graphics::renderer::Renderer::new();
+    let mut renderer = graphics::renderer::Renderer::new().unwrap();
     renderer.set_clear_color(math::cg::Color::from_rgb(0.1, 0.1, 0.1));
 
     event_loop.run(move |event, _, control_flow| {
@@ -31,7 +31,10 @@ fn main() {
         match event {
             Event::LoopDestroyed => (),
             Event::WindowEvent { event, .. } => match event {
-                WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
+                WindowEvent::CloseRequested => {
+                    *control_flow = ControlFlow::Exit;
+                    renderer.cleanup();
+                }
                 WindowEvent::Resized(physical_size) => gl_context.resize(physical_size),
                 _ => (),
             },
