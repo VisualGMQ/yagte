@@ -1,5 +1,6 @@
 pub mod buffer;
+pub mod camera;
 mod glhelper;
 pub mod renderer;
-pub mod vertex_attr;
 pub mod shader;
+pub mod vertex_attr;

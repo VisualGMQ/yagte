@@ -1,15 +1,43 @@
 use crate::buffer::*;
 use crate::gl_call;
 use crate::glhelper::GLResult;
+use crate::shader::Shader;
+use crate::shader::ShaderType;
+use crate::shader::ShaderUnit;
 use crate::vertex_attr::*;
 use gl;
 use math;
+
+static VERTEX_SHADER_CODE: &str = r#"#version 330 core
+
+layout(location = 0) in vec3 aPosition;
+
+uniform mat4 project;
+uniform mat4 model;
+uniform mat4 view;
+
+void main() {
+    gl_Position = project * model * view * vec4(aPosition, 1.0);
+}
+"#;
+
+static FRAG_SHADER_CODE: &str = r#"#version 330 core
+
+out vec4 FragColor;
+
+uniform vec4 color;
+
+void main() {
+    FragColor = color;
+}
+"#;
 
 pub struct Renderer {
     color: math::cg::Color,
     vao: VertexAttribute,
     vbo: Buffer,
     ebo: Buffer,
+    shader: Shader,
 }
 
 impl Renderer {
@@ -20,11 +48,17 @@ impl Renderer {
             count: 2,
         });
 
+        let shader = Shader::new(
+            &ShaderUnit::new(ShaderType::Vertex, VERTEX_SHADER_CODE)?,
+            &ShaderUnit::new(ShaderType::Fragment, FRAG_SHADER_CODE)?,
+        )?;
+
         Ok(Self {
             color: math::cg::Color::white(),
             vao: VertexAttribute::new(&bunch)?,
             vbo: Buffer::new(BufferType::ArrayBuffer)?,
             ebo: Buffer::new(BufferType::ElementBuffer)?,
+            shader,
         })
     }
 
@@ -50,5 +84,6 @@ impl Renderer {
         drop(&mut self.ebo);
         drop(&mut self.vbo);
         drop(&mut self.vao);
+        drop(&mut self.shader);
     }
 }

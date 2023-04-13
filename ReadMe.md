@@ -10,6 +10,8 @@ Yet Another Geometric Tool
 * :heavy_check_mark: : 编写完成，测试通过
 * :no_entry_sign: : 无需完成
 
+### 计算几何部分
+
 2D求最短距离：
 
 ||Point|Line|Segment|Ray|Triangle|Polyline|Polygon|

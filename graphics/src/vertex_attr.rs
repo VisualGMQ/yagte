@@ -90,7 +90,7 @@ pub struct VertexAttribute {
 }
 
 impl VertexAttribute {
-    pub fn new( attributes: &AttrBunch) -> GLResult<Self> {
+    pub fn new(attributes: &AttrBunch) -> GLResult<Self> {
         let mut id: u32 = 0;
 
         gl_call!(gl::GenVertexArrays(1, &mut id as *mut u32))?;
@@ -111,7 +111,6 @@ impl VertexAttribute {
             gl_call!(gl::EnableVertexAttribArray(i))?;
             i += 1;
         }
-
 
         Ok(Self { id })
     }

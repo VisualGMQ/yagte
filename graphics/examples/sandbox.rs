@@ -6,11 +6,13 @@ use glium::glutin::{
 };
 
 fn main() {
+    env_logger::init();
+
     let event_loop = EventLoop::new();
     let window = WindowBuilder::new().with_title("Learn OpenGL with Rust");
 
     let gl_context = ContextBuilder::new()
-        .with_gl(GlRequest::Specific(Api::OpenGl, (4, 5)))
+        .with_gl(GlRequest::Specific(Api::OpenGl, (4, 4)))
         .build_windowed(window, &event_loop)
         .expect("Cannot create windowed context");
 

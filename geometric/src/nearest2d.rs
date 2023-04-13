@@ -1,7 +1,7 @@
 use crate::geom2d::*;
 use math::matrix::*;
 
-pub fn pt2line_param(pt: &Vec2, line: &Line) -> f64 {
+pub fn pt2line_param(pt: &Vec2, line: &Line) -> f32 {
     (*pt - *line.start()).dot(line.dir()) / line.dir().length_sqrd()
 }
 
@@ -10,7 +10,7 @@ pub fn pt2line(pt: &Vec2, line: &Line) -> Vec2 {
     *line.start() + *line.dir() * t
 }
 
-pub fn pt2ray_param(pt: &Vec2, line: &Line) -> f64 {
+pub fn pt2ray_param(pt: &Vec2, line: &Line) -> f32 {
     let t = pt2line_param(pt, line);
     t.max(0.0)
 }
@@ -20,7 +20,7 @@ pub fn pt2ray(pt: &Vec2, line: &Line) -> Vec2 {
     *line.start() + *line.dir() * t
 }
 
-pub fn pt2segment_param(pt: &Vec2, line: &Line) -> f64 {
+pub fn pt2segment_param(pt: &Vec2, line: &Line) -> f32 {
     let t = pt2line_param(pt, line);
     t.clamp(0.0, 1.0)
 }

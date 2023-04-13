@@ -2,26 +2,26 @@ use crate::geom2d::*;
 use crate::nearest2d::*;
 use math::matrix::*;
 
-pub fn pt2pt_sqrd(pt1: &Vec2, pt2: &Vec2) -> f64 {
+pub fn pt2pt_sqrd(pt1: &Vec2, pt2: &Vec2) -> f32 {
     (*pt2 - *pt1).length_sqrd()
 }
 
-pub fn pt2line_sqrd(pt: &Vec2, line: &Line) -> f64 {
+pub fn pt2line_sqrd(pt: &Vec2, line: &Line) -> f32 {
     let p = pt2line(pt, line);
     pt2pt_sqrd(&p, pt)
 }
 
-pub fn pt2seg_sqrd(pt: &Vec2, seg: &Line) -> f64 {
+pub fn pt2seg_sqrd(pt: &Vec2, seg: &Line) -> f32 {
     let p = pt2segment(pt, seg);
     pt2pt_sqrd(&p, pt)
 }
 
-pub fn pt2ray_sqrd(pt: &Vec2, line: &Line) -> f64 {
+pub fn pt2ray_sqrd(pt: &Vec2, line: &Line) -> f32 {
     let p = pt2ray(pt, line);
     pt2pt_sqrd(&p, pt)
 }
 
-pub fn pt2polyline_sqrd(pt: &Vec2, polyline: &[Vec2]) -> Option<f64> {
+pub fn pt2polyline_sqrd(pt: &Vec2, polyline: &[Vec2]) -> Option<f32> {
     if polyline.is_empty() {
         return None;
     }
@@ -30,7 +30,7 @@ pub fn pt2polyline_sqrd(pt: &Vec2, polyline: &[Vec2]) -> Option<f64> {
         return Some(pt2pt_sqrd(pt, polyline.first().unwrap()));
     }
 
-    let mut min_dist: Option<f64> = None;
+    let mut min_dist: Option<f32> = None;
 
     let iter = polyline.windows(2);
     for pts in iter {
@@ -57,15 +57,15 @@ pub fn pt2polyline_sqrd(pt: &Vec2, polyline: &[Vec2]) -> Option<f64> {
     min_dist
 }
 
-pub fn pt2polygon_sqrd(pt: &Vec2, polygon: &[Vec2]) -> f64 {
+pub fn pt2polygon_sqrd(pt: &Vec2, polygon: &[Vec2]) -> f32 {
     todo!();
 }
 
-pub fn pt2triangle_sqrd(pt: &Vec2, triangle: Triangle) -> f64 {
+pub fn pt2triangle_sqrd(pt: &Vec2, triangle: Triangle) -> f32 {
     todo!();
 }
 
-pub fn line2line_sqrd(l1: &Line, l2: &Line) -> Option<f64> {
+pub fn line2line_sqrd(l1: &Line, l2: &Line) -> Option<f32> {
     if l1.dir().cross(l2.dir()) != 0.0 {
         return None;
     }
@@ -73,7 +73,7 @@ pub fn line2line_sqrd(l1: &Line, l2: &Line) -> Option<f64> {
     Some((*l1.start() - *l2.start()).dot(l1.normal()).abs())
 }
 
-pub fn ray2line_sqrd(l: &Line, ray: &Line) -> Option<f64> {
+pub fn ray2line_sqrd(l: &Line, ray: &Line) -> Option<f32> {
     match line2line_sqrd(l, ray) {
         Some(dist) => Some(dist),
         None => {
@@ -91,18 +91,18 @@ pub fn ray2line_sqrd(l: &Line, ray: &Line) -> Option<f64> {
     }
 }
 
-pub fn line2seg_sqrd(l: &Line, seg: &Line) -> Option<f64> {
+pub fn line2seg_sqrd(l: &Line, seg: &Line) -> Option<f32> {
     todo!();
 }
 
-pub fn seg2seg_sqrd(s1: &Line, s2: &Line) -> Option<f64> {
+pub fn seg2seg_sqrd(s1: &Line, s2: &Line) -> Option<f32> {
     todo!();
 }
 
-pub fn ray2ray_sqrd(r1: &Line, r2: &Line) -> Option<f64> {
+pub fn ray2ray_sqrd(r1: &Line, r2: &Line) -> Option<f32> {
     todo!();
 }
 
-pub fn ray2seg_sqrd(ray: &Line, seg: &Line) -> Option<f64> {
+pub fn ray2seg_sqrd(ray: &Line, seg: &Line) -> Option<f32> {
     todo!();
 }

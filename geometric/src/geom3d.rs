@@ -31,3 +31,37 @@ impl IndexMut<usize> for Triangle {
         &mut self.pts[index]
     }
 }
+
+#[derive(Clone, Copy, Debug)]
+pub struct Frustum {
+    pub near: f32,
+    pub far: f32,
+    pub half_fovy: f32,
+    pub aspect: f32,
+}
+
+impl Frustum {
+    pub fn new(near: f32, far: f32, half_fovy: f32, aspect: f32) -> Self {
+        Self {
+            near,
+            far,
+            half_fovy,
+            aspect,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct Cube {
+    pub center: Vec3,
+    pub half_len: Vec3,
+}
+
+impl Cube {
+    pub fn from_center(center: Vec3, half_len: Vec3) -> Self {
+        let min = center - half_len;
+        let max = center + half_len;
+
+        Self { center, half_len }
+    }
+}

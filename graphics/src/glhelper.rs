@@ -3,6 +3,8 @@ use gl;
 #[derive(Debug, PartialEq)]
 pub enum GLErrorType {
     NoError = 0,
+
+    // gl inner error
     InvalidEnum,
     InvalidValue,
     InvalidOperation,
@@ -10,6 +12,13 @@ pub enum GLErrorType {
     OutOfMemory,
     StackUnderflow,
     OverFlow,
+
+    // custom define error
+    ShaderCompileFailed,
+    ShaderLinkFailed,
+    CreateShaderProgramFailed,
+    CreateShaderFailed,
+
     Unknown,
 }
 
@@ -35,8 +44,9 @@ pub fn gl_clear_error() {
 }
 
 pub fn gl_get_error() -> GLErrorType {
+    let err = gl_get_top_error();
     gl_clear_error();
-    gl_get_top_error()
+    err
 }
 
 pub type GLResult<T> = Result<T, GLErrorType>;

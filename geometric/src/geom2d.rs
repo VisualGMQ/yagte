@@ -80,11 +80,11 @@ impl IndexMut<usize> for Triangle {
 
 pub struct Circle {
     center: Vec2,
-    radius: f64,
+    radius: f32,
 }
 
 impl Circle {
-    pub fn new(center: Vec2, radius: f64) -> Circle {
+    pub fn new(center: Vec2, radius: f32) -> Circle {
         Circle { center, radius }
     }
 
@@ -92,7 +92,7 @@ impl Circle {
         &self.center
     }
 
-    pub fn radius(&self) -> f64 {
+    pub fn radius(&self) -> f32 {
         self.radius
     }
 

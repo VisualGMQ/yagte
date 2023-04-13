@@ -285,9 +285,15 @@ impl<T: ArithmeticGroup<T>, const LEN: usize> MulAssign<Matrix<T, LEN, LEN>>
     }
 }
 
-pub type Mat22 = Matrix<f64, 2, 2>;
-pub type Mat33 = Matrix<f64, 3, 3>;
-pub type Mat44 = Matrix<f64, 4, 4>;
+pub type Mat22 = Matrix<f32, 2, 2>;
+pub type Mat33 = Matrix<f32, 3, 3>;
+pub type Mat44 = Matrix<f32, 4, 4>;
+
+impl<const COL: usize, const ROW: usize> Matrix<f32, COL, ROW> {
+    pub unsafe fn as_ptr(&self) -> *const f32 {
+        self.data.as_ptr().cast()
+    }
+}
 
 pub type ColVector<T, const LEN: usize> = Matrix<T, 1, LEN>;
 pub type RowVector<T, const LEN: usize> = Matrix<T, LEN, 1>;
@@ -461,6 +467,6 @@ impl<T: ArithmeticGroup<T>> Vector4<T> {
     }
 }
 
-pub type Vec2 = Vector2<f64>;
-pub type Vec3 = Vector3<f64>;
-pub type Vec4 = Vector4<f64>;
+pub type Vec2 = Vector2<f32>;
+pub type Vec3 = Vector3<f32>;
+pub type Vec4 = Vector4<f32>;
