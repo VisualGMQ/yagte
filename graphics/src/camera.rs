@@ -39,6 +39,10 @@ impl Camera {
         }
     }
 
+    pub fn get_project_object(&self) -> &ProjectGeomentry {
+        &self.proj_obj
+    }
+
     pub fn move_to(&mut self, position: Vec3) {
         self.position = position;
         self.recalc_view();

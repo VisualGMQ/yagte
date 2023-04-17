@@ -1,7 +1,7 @@
 use gl;
 
 use crate::gl_call;
-use crate::glhelper::GLResult;
+use crate::glhelper::{GLResult, GLErrorType};
 
 #[derive(Debug, Clone, Copy)]
 pub enum BufferType {
@@ -19,6 +19,11 @@ impl Buffer {
     pub fn new(btype: BufferType) -> GLResult<Buffer> {
         let mut id: u32 = 0;
         gl_call!(gl::GenBuffers(1, &mut id as *mut u32))?;
+
+        if id == 0 {
+            return Err(GLErrorType::CreateBufferFailed);
+        }
+
         Ok(Self { btype, id })
     }
 
@@ -32,12 +37,12 @@ impl Buffer {
         Ok(())
     }
 
-    pub fn buffer_data<T: bytemuck::Pod>(&self, data: &T) -> GLResult<()> {
+    pub fn buffer_data(&self, data: &[u8]) -> GLResult<()> {
         self.bind()?;
         gl_call!(gl::BufferData(
             buffertype2u32(self.btype),
             std::mem::size_of_val(data) as isize,
-            bytemuck::bytes_of(data).as_ptr() as *const _,
+            data.as_ptr().cast(),
             gl::STATIC_DRAW
         ))?;
         Ok(())

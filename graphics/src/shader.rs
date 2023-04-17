@@ -1,9 +1,6 @@
-use std::ptr::null;
-
 use crate::{
     gl_call,
     glhelper::{GLErrorType, GLResult},
-    shader,
 };
 
 #[derive(Clone, Copy, Debug)]
@@ -52,6 +49,10 @@ impl ShaderUnit {
 
         Ok(Self { stype: t, id })
     }
+
+    pub fn get_type(&self) -> ShaderType {
+        self.stype
+    }
 }
 
 impl Drop for ShaderUnit {
@@ -84,13 +85,13 @@ impl Shader {
         Ok(Self { id })
     }
 
-    pub fn bind(&self) -> GLResult<()> {
-        gl_call!(gl::BindProgramPipeline(self.id))?;
+    pub fn use_shader(&self) -> GLResult<()> {
+        gl_call!(gl::UseProgram(self.id))?;
         Ok(())
     }
 
-    pub fn unbind(&self) -> GLResult<()> {
-        gl_call!(gl::BindProgramPipeline(0))?;
+    pub fn unuse(&self) -> GLResult<()> {
+        gl_call!(gl::UseProgram(0))?;
         Ok(())
     }
 

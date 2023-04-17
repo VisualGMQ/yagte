@@ -1,5 +1,5 @@
 use crate::gl_call;
-use crate::glhelper::GLResult;
+use crate::glhelper::{GLResult, GLErrorType};
 use gl;
 
 #[derive(Debug, Clone, Copy)]
@@ -51,7 +51,7 @@ impl AttrBunch {
     }
 
     pub fn add(&mut self, attr: Attribute) {
-        self.stride += u32::try_from(get_attribtype_size(attr.attrib_type)).unwrap();
+        self.stride += attr.count * u32::try_from(get_attribtype_size(attr.attrib_type)).unwrap();
         self.attrs.push(attr);
     }
 
@@ -96,13 +96,15 @@ impl VertexAttribute {
         gl_call!(gl::GenVertexArrays(1, &mut id as *mut u32))?;
         gl_call!(gl::BindVertexArray(id))?;
 
+        if id == 0 {
+            return Err(GLErrorType::CreateVertexAttributeFailed);
+        }
+
         let mut i = 0;
         for attribute in attributes.iter() {
             gl_call!(gl::VertexAttribPointer(
                 i,
-                get_attribtype_size(attribute.attrib_type)
-                    .try_into()
-                    .unwrap(),
+                attribute.count.try_into().unwrap(),
                 get_attribtype_gl_type(attribute.attrib_type),
                 0,
                 attributes.stride().try_into().unwrap(),

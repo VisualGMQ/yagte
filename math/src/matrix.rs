@@ -1,9 +1,9 @@
+use crate::arithmetic::*;
 use std::ops::{
     Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
 };
 
-use crate::arithmetic::*;
-
+#[repr(C)]
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct Matrix<T, const COL: usize, const ROW: usize> {
     data: [[T; ROW]; COL],
