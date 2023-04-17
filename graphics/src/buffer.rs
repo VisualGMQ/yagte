@@ -1,7 +1,7 @@
 use gl;
 
 use crate::gl_call;
-use crate::glhelper::{GLResult, GLErrorType};
+use crate::glhelper::{GLErrorType, GLResult};
 
 #[derive(Debug, Clone, Copy)]
 pub enum BufferType {

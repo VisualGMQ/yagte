@@ -1,4 +1,5 @@
 use crate::buffer::*;
+use crate::camera;
 use crate::gl_call;
 use crate::glhelper::GLResult;
 use crate::shader::Shader;
@@ -8,14 +9,13 @@ use crate::vertex_attr::*;
 use gl;
 use math;
 
-/*
 static VERTEX_SHADER_CODE: &str = r#"#version 330 core
 
 layout(location = 0) in vec3 aPosition;
 
-uniform mat4 project;
 uniform mat4 model;
 uniform mat4 view;
+uniform mat4 project;
 
 void main() {
     gl_Position = project * model * view * vec4(aPosition, 1.0);
@@ -30,25 +30,6 @@ uniform vec4 color;
 
 void main() {
     FragColor = color;
-}
-"#;
-*/
-
-static VERTEX_SHADER_CODE: &str = r#"#version 330 core
-
-layout(location = 0) in vec3 aPosition;
-
-void main() {
-    gl_Position = vec4(aPosition, 1.0);
-}
-"#;
-
-static FRAG_SHADER_CODE: &str = r#"#version 330 core
-
-out vec4 FragColor;
-
-void main() {
-    FragColor = vec4(0.0, 1.0, 0.0, 1.0);
 }
 "#;
 
@@ -70,10 +51,16 @@ pub struct Renderer {
     vbo: Buffer,
     ebo: Buffer,
     shader: Shader,
+    camera: camera::Camera,
+}
+
+pub enum RenderType {
+    Solid,
+    Framework,
 }
 
 impl Renderer {
-    pub fn new(w: i32, h: i32) -> GLResult<Self> {
+    pub fn new(w: i32, h: i32, camera: camera::Camera) -> GLResult<Self> {
         let mut bunch = AttrBunch::new();
         bunch.add(Attribute {
             attrib_type: AttribType::Float,
@@ -104,7 +91,16 @@ impl Renderer {
             ebo,
             vao,
             shader,
+            camera,
         })
+    }
+
+    pub fn set_render_type(render_type: RenderType) -> GLResult<()> {
+        match render_type {
+            RenderType::Solid => gl_call!(gl::PolygonMode(gl::FRONT_AND_BACK, gl::FILL))?,
+            RenderType::Framework => gl_call!(gl::PolygonMode(gl::FRONT_AND_BACK, gl::LINE))?,
+        }
+        Ok(())
     }
 
     pub fn resize(&self, w: i32, h: i32) -> GLResult<()> {
@@ -130,7 +126,12 @@ impl Renderer {
         .unwrap();
     }
 
-    pub fn draw_arrays(&mut self, vertices: &[Vertex]) -> GLResult<()> {
+    pub fn draw_arrays(
+        &mut self,
+        vertices: &[Vertex],
+        model: &math::matrix::Mat44,
+        color: &math::matrix::Vec4,
+    ) -> GLResult<()> {
         self.vao.bind()?;
 
         self.vbo.bind()?;
@@ -138,6 +139,10 @@ impl Renderer {
         self.vbo.buffer_data(datas)?;
 
         self.shader.use_shader()?;
+        self.shader.set_mat4("project", self.camera.get_project())?;
+        self.shader.set_mat4("view", self.camera.get_view())?;
+        self.shader.set_mat4("model", model)?;
+        self.shader.set_vec4("color", color)?;
 
         gl_call!(gl::DrawArrays(
             gl::TRIANGLES,
@@ -148,7 +153,13 @@ impl Renderer {
         Ok(())
     }
 
-    pub fn draw_elements(&mut self, vertices: &[Vertex], indices: &[u32]) -> GLResult<()> {
+    pub fn draw_elements(
+        &mut self,
+        vertices: &[Vertex],
+        indices: &[u32],
+        model: &math::matrix::Mat44,
+        color: &math::matrix::Vec4,
+    ) -> GLResult<()> {
         self.vao.bind()?;
 
         self.vbo.bind()?;
@@ -159,6 +170,10 @@ impl Renderer {
         self.ebo.buffer_data(datas)?;
 
         self.shader.use_shader()?;
+        self.shader.set_mat4("project", self.camera.get_project())?;
+        self.shader.set_mat4("view", self.camera.get_view())?;
+        self.shader.set_mat4("model", model)?;
+        self.shader.set_vec4("color", color)?;
 
         gl_call!(gl::DrawElements(
             gl::TRIANGLES,

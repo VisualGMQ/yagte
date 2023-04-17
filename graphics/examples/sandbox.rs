@@ -1,3 +1,4 @@
+use geometric::geom3d::Frustum;
 use glium::glutin::{
     dpi::Size,
     event::{Event, WindowEvent},
@@ -5,7 +6,8 @@ use glium::glutin::{
     window::WindowBuilder,
     Api, ContextBuilder, GlRequest,
 };
-use graphics::renderer::Vertex;
+use graphics::{camera, renderer::Vertex};
+use math::cg::*;
 
 const WINDOW_WIDTH: i32 = 1024;
 const WINDOW_HEIGHT: i32 = 720;
@@ -34,7 +36,17 @@ fn main() {
 
     gl::load_with(|ptr| gl_context.get_proc_address(ptr) as *const _);
 
-    let mut renderer = graphics::renderer::Renderer::new(WINDOW_WIDTH, WINDOW_HEIGHT).unwrap();
+    let camera = camera::Camera::from_persp(
+        Frustum::new(
+            0.1,
+            100.0,
+            30f32.to_radians(),
+            WINDOW_WIDTH as f32 / WINDOW_HEIGHT as f32,
+        ),
+        math::matrix::Vec3::zeros(),
+    );
+
+    let mut renderer = graphics::renderer::Renderer::new(WINDOW_WIDTH, WINDOW_HEIGHT, camera).unwrap();
     renderer.set_clear_color(math::cg::Color::from_rgb(0.1, 0.1, 0.1));
 
     event_loop.run(move |event, _, control_flow| {
@@ -61,11 +73,17 @@ fn main() {
             Event::RedrawRequested(_) => {
                 renderer.clear();
                 let vertices = [
-                    Vertex::new(math::matrix::Vec3::from_xyz(-0.5, -0.5, 0.0)),
-                    Vertex::new(math::matrix::Vec3::from_xyz(0.5, -0.5, 0.0)),
-                    Vertex::new(math::matrix::Vec3::from_xyz(0.0, 0.5, 0.0)),
+                    Vertex::new(math::matrix::Vec3::from_xyz(-1.0, -1.0, 0.0)),
+                    Vertex::new(math::matrix::Vec3::from_xyz(1.0, -1.0, 0.0)),
+                    Vertex::new(math::matrix::Vec3::from_xyz(0.0, 1.0, 0.0)),
                 ];
-                renderer.draw_arrays(&vertices).unwrap();
+                renderer
+                    .draw_arrays(
+                        &vertices,
+                        &Translation::new(0.0, 0.0, -4.0).get_mat(),
+                        &math::matrix::Vec4::from_xyzw(0.0, 1.0, 0.0, 1.0),
+                    )
+                    .unwrap();
                 gl_context.swap_buffers().unwrap();
             }
             _ => (),

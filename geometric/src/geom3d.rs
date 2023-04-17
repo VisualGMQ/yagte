@@ -59,9 +59,12 @@ pub struct Cube {
 
 impl Cube {
     pub fn from_center(center: Vec3, half_len: Vec3) -> Self {
-        let min = center - half_len;
-        let max = center + half_len;
+        Self { center, half_len }
+    }
 
+    pub fn from_min_max(min: Vec3, max: Vec3) -> Self {
+        let center = (max + min) * 0.5;
+        let half_len = (max - min) * 0.5;
         Self { center, half_len }
     }
 }

@@ -392,6 +392,16 @@ impl<T: ArithmeticGroup<T>> Vector2<T> {
 }
 
 impl<T: ArithmeticGroup<T>> Vector3<T> {
+    pub fn x_axis() -> Self {
+        Self::from_xyz(T::identity(), T::zero(), T::zero())
+    }
+    pub fn y_axis() -> Self {
+        Self::from_xyz(T::zero(), T::identity(), T::zero())
+    }
+    pub fn z_axis() -> Self {
+        Self::from_xyz(T::zero(), T::zero(), T::identity())
+    }
+
     pub fn from_xyz(x: T, y: T, z: T) -> Self {
         Self::new([x, y, z])
     }

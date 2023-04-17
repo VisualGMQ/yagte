@@ -6,11 +6,18 @@ pub enum ProjectGeomentry {
     Cube(geom3d::Cube),
 }
 
+enum RotateType {
+    LookAt(Vec3),
+    EularRot(Vec3),
+}
+
 pub struct Camera {
     proj_obj: ProjectGeomentry,
     project: Mat44,
     view: Mat44,
     position: Vec3,
+
+    rotate: RotateType,
 }
 
 impl Camera {
@@ -22,6 +29,7 @@ impl Camera {
             project: create_ortho_project(min.x(), max.x(), min.y(), max.y(), max.z(), max.z()),
             view: Mat44::identity(),
             position,
+            rotate: RotateType::EularRot(Vec3::zeros()),
         }
     }
 
@@ -34,8 +42,9 @@ impl Camera {
                 frustum.half_fovy,
                 frustum.aspect,
             ),
-            view: Camera::calc_view(&position),
+            view: Mat44::identity(),
             position,
+            rotate: RotateType::EularRot(Vec3::zeros()),
         }
     }
 
@@ -48,13 +57,35 @@ impl Camera {
         self.recalc_view();
     }
 
-    fn recalc_view(&mut self) {
-        // TODO add rotation
-        self.view = Camera::calc_view(&self.position);
+    pub fn lookat(&mut self, target: Vec3) {
+        self.rotate = RotateType::LookAt(target);
+        self.recalc_view();
     }
 
-    fn calc_view(position: &Vec3) -> Mat44 {
-        Translation::new(-position.x(), -position.y(), -position.z()).get_mat()
+    pub fn set_rotation(&mut self, rotation: Vec3) {
+        self.rotate = RotateType::EularRot(rotation);
+        self.recalc_view();
+    }
+
+    #[rustfmt::skip]
+    fn recalc_view(&mut self) {
+        let rotate = match self.rotate {
+            RotateType::LookAt(target) => {
+                let up = Vec3::y_axis();
+                let back = (self.position - target).normalize();
+                let right = up.cross(&back);
+                let up = back.cross(&right);
+                Mat44::from_row(&[
+                    right.x(), right.y(), right.z(), 0.0,
+                       up.x(),    up.y(),    up.z(), 0.0,
+                     back.x(),  back.y(),  back.z(), 0.0,
+                          0.0,       0.0,       0.0, 1.0,
+                ])
+            },
+            RotateType::EularRot(rotation) => math::cg::EularRotationXYZ::new(-rotation.x(), -rotation.y(), -rotation.z()).get_mat(),
+        };
+        let translation = Translation::new(-self.position.x(), -self.position.y(), -self.position.z()).get_mat();
+        self.view = rotate * translation;
     }
 
     pub fn get_project(&self) -> &Mat44 {

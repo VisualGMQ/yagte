@@ -1,5 +1,5 @@
 use crate::gl_call;
-use crate::glhelper::{GLResult, GLErrorType};
+use crate::glhelper::{GLErrorType, GLResult};
 use gl;
 
 #[derive(Debug, Clone, Copy)]

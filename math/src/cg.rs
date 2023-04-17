@@ -283,7 +283,7 @@ impl Transformation for EularRotationXYZ {
 
 #[rustfmt::skip]
 pub fn create_persp_project(near: f32, far: f32, half_fovy: f32, aspect: f32) -> Mat44 {
-    let inv_half_w = 1.0 / half_fovy.tan() * near;
+    let inv_half_w = 1.0 / (half_fovy.tan() * near);
     let inv_half_h = aspect * inv_half_w;
 
     Mat44::from_row(&[
