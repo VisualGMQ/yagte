@@ -18,10 +18,8 @@ impl<T: ArithmeticGroup<T>, const COL: usize, const ROW: usize> Matrix<T, COL, R
 
     pub fn from_row(datas: &[T]) -> Self {
         let mut result = Self::zeros();
-        let mut i = 0usize;
-        for elem in datas {
+        for (i, elem) in datas.iter().enumerate() {
             result.set(i % COL, i / COL, *elem);
-            i += 1;
         }
         result
     }
@@ -32,10 +30,8 @@ impl<T: ArithmeticGroup<T>, const COL: usize, const ROW: usize> Matrix<T, COL, R
 
     pub fn from_col(datas: &[T]) -> Self {
         let mut result = Self::zeros();
-        let mut i = 0usize;
-        for elem in datas {
+        for (i, elem) in datas.iter().enumerate() {
             result.set(i / ROW, i % ROW, *elem);
-            i += 1;
         }
         result
     }
@@ -290,7 +286,7 @@ pub type Mat33 = Matrix<f32, 3, 3>;
 pub type Mat44 = Matrix<f32, 4, 4>;
 
 impl<const COL: usize, const ROW: usize> Matrix<f32, COL, ROW> {
-    pub unsafe fn as_ptr(&self) -> *const f32 {
+    pub fn as_ptr(&self) -> *const f32 {
         self.data.as_ptr().cast()
     }
 }

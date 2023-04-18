@@ -37,19 +37,13 @@ pub struct Attribute {
     pub(crate) count: u32,
 }
 
+#[derive(Default)]
 pub struct AttrBunch {
     attrs: Vec<Attribute>,
     stride: u32,
 }
 
 impl AttrBunch {
-    pub fn new() -> Self {
-        Self {
-            attrs: Vec::new(),
-            stride: 0,
-        }
-    }
-
     pub fn add(&mut self, attr: Attribute) {
         self.stride += attr.count * u32::try_from(get_attribtype_size(attr.attrib_type)).unwrap();
         self.attrs.push(attr);
@@ -61,11 +55,13 @@ impl AttrBunch {
 
     pub fn iter(&self) -> AttrBunchIterator {
         AttrBunchIterator {
-            bunch: &self,
+            bunch: self,
             index: 0,
         }
     }
 }
+
+
 
 pub struct AttrBunchIterator<'a> {
     bunch: &'a AttrBunch,
@@ -100,18 +96,17 @@ impl VertexAttribute {
             return Err(GLErrorType::CreateVertexAttributeFailed);
         }
 
-        let mut i = 0;
-        for attribute in attributes.iter() {
+        for (i, attribute) in attributes.iter().enumerate() {
+            let i = u32::try_from(i).unwrap();
             gl_call!(gl::VertexAttribPointer(
                 i,
                 attribute.count.try_into().unwrap(),
                 get_attribtype_gl_type(attribute.attrib_type),
                 0,
                 attributes.stride().try_into().unwrap(),
-                0 as *const _
+                std::ptr::null()
             ))?;
             gl_call!(gl::EnableVertexAttribArray(i))?;
-            i += 1;
         }
 
         Ok(Self { id })
@@ -126,10 +121,9 @@ impl VertexAttribute {
         gl_call!(gl::BindVertexArray(0))?;
         Ok(())
     }
-}
 
-impl Drop for VertexAttribute {
-    fn drop(&mut self) {
+    pub fn cleanup(&mut self) {
         gl_call!(gl::DeleteVertexArrays(1, &self.id as *const u32)).unwrap();
+        self.id = 0;
     }
 }

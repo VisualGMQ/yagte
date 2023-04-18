@@ -43,7 +43,7 @@ pub fn pt2rect(pt: &Vec2, rect: &Rect) -> Vec2 {
     )
 }
 
-pub fn pt2triangle(pt: &Vec2, triangle: &Triangle) -> Vec2 {
+pub fn pt2triangle(_pt: &Vec2, _triangle: &Triangle) -> Vec2 {
     todo!();
 }
 

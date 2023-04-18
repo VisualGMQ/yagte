@@ -121,9 +121,9 @@ impl DerefMut for Color {
     }
 }
 
-impl Into<Vec4> for Color {
-    fn into(self) -> Vec4 {
-        self.0
+impl From<Color> for Vec4 {
+    fn from(val: Color) -> Self {
+        val.0
     }
 }
 

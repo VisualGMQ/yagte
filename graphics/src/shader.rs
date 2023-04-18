@@ -104,7 +104,7 @@ impl Shader {
                 self.id,
                 loc,
                 1,
-                gl::FALSE.into(),
+                gl::FALSE,
                 m.as_ptr()
             ))?;
         }
@@ -120,7 +120,7 @@ impl Shader {
                 self.id,
                 loc,
                 1,
-                gl::FALSE.into(),
+                gl::FALSE,
                 m.as_ptr()
             ))?;
         }
@@ -156,10 +156,9 @@ impl Shader {
         }
         Ok(())
     }
-}
 
-impl Drop for Shader {
-    fn drop(&mut self) {
+    pub fn cleanup(&mut self) {
         gl_call!(gl::DeleteProgram(self.id)).unwrap();
+        self.id = 0;
     }
 }

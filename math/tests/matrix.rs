@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod test {
-    use yagt_math::matrix::*;
+    use math::matrix::*;
 
     #[test]
     fn constants() {

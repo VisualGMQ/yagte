@@ -1,6 +1,6 @@
 use geometric::geom3d::Frustum;
-use graphics::{camera, renderer::Vertex};
-use math::cg::*;
+use graphics::{camera};
+
 use window::{
     app::AppBuilder,
     winit::{
@@ -16,7 +16,7 @@ fn main() {
     env_logger::init();
 
     let app = AppBuilder::new(
-        "opengl sandbox",
+        "VisualDebugger",
         math::matrix::Vec2::from_xy(WINDOW_WIDTH as f32, WINDOW_HEIGHT as f32),
     );
 
@@ -55,18 +55,6 @@ fn main() {
             },
             Event::RedrawRequested(_) => {
                 renderer.clear();
-                let vertices = [
-                    Vertex::new(math::matrix::Vec3::from_xyz(-1.0, -1.0, 0.0)),
-                    Vertex::new(math::matrix::Vec3::from_xyz(1.0, -1.0, 0.0)),
-                    Vertex::new(math::matrix::Vec3::from_xyz(0.0, 1.0, 0.0)),
-                ];
-                renderer
-                    .draw_arrays(
-                        &vertices,
-                        &Translation::new(0.0, 0.0, -4.0).get_mat(),
-                        &math::matrix::Vec4::from_xyzw(0.0, 1.0, 0.0, 1.0),
-                    )
-                    .unwrap();
             }
             _ => (),
         }

@@ -46,7 +46,7 @@ impl Vertex {
 }
 
 pub struct Renderer {
-    color: math::cg::Color,
+    clear_color: math::cg::Color,
     vao: VertexAttribute,
     vbo: Buffer,
     ebo: Buffer,
@@ -61,7 +61,7 @@ pub enum RenderType {
 
 impl Renderer {
     pub fn new(w: i32, h: i32, camera: camera::Camera) -> GLResult<Self> {
-        let mut bunch = AttrBunch::new();
+        let mut bunch = AttrBunch::default();
         bunch.add(Attribute {
             attrib_type: AttribType::Float,
             count: 3,
@@ -86,7 +86,7 @@ impl Renderer {
         let vao = VertexAttribute::new(&bunch)?;
 
         Ok(Self {
-            color: math::cg::Color::white(),
+            clear_color: math::cg::Color::white(),
             vbo,
             ebo,
             vao,
@@ -109,12 +109,12 @@ impl Renderer {
     }
 
     pub fn set_clear_color(&mut self, color: math::cg::Color) {
-        self.color = color;
+        self.clear_color = color;
         gl_call!(gl::ClearColor(
-            self.color.r() as f32,
-            self.color.g() as f32,
-            self.color.b() as f32,
-            self.color.a() as f32,
+            self.clear_color.r(),
+            self.clear_color.g(),
+            self.clear_color.b(),
+            self.clear_color.a(),
         ))
         .unwrap();
     }
@@ -186,9 +186,9 @@ impl Renderer {
     }
 
     pub fn cleanup(&mut self) {
-        drop(&mut self.ebo);
-        drop(&mut self.vbo);
-        drop(&mut self.vao);
-        drop(&mut self.shader);
+        self.ebo.cleanup();
+        self.vao.cleanup();
+        self.vbo.cleanup();
+        self.shader.cleanup();
     }
 }

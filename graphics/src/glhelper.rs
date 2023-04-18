@@ -1,4 +1,4 @@
-use gl;
+
 
 #[derive(Debug, PartialEq)]
 pub enum GLErrorType {
@@ -57,10 +57,10 @@ pub type GLResult<T> = Result<T, GLErrorType>;
 macro_rules! gl_call {
     ($expr: expr) => {
         unsafe {
-            crate::glhelper::gl_clear_error();
+            $crate::glhelper::gl_clear_error();
             let result = $expr;
-            let error = crate::glhelper::gl_get_error();
-            if error == crate::glhelper::GLErrorType::NoError {
+            let error = $crate::glhelper::gl_get_error();
+            if error == $crate::glhelper::GLErrorType::NoError {
                 Ok(result)
             } else {
                 log::error!(target: "OpenGL", "Occured Error: {:?}", error);

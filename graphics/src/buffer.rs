@@ -51,17 +51,16 @@ impl Buffer {
     pub fn get_type(&self) -> BufferType {
         self.btype
     }
+
+    pub fn cleanup(&mut self) {
+        gl_call!(gl::DeleteBuffers(1, &self.id as *const u32)).unwrap();
+        self.id = 0;
+    }
 }
 
 fn buffertype2u32(t: BufferType) -> u32 {
     match t {
         BufferType::ArrayBuffer => gl::ARRAY_BUFFER,
         BufferType::ElementBuffer => gl::ELEMENT_ARRAY_BUFFER,
-    }
-}
-
-impl Drop for Buffer {
-    fn drop(&mut self) {
-        gl_call!(gl::DeleteBuffers(1, &self.id as *const u32)).unwrap();
     }
 }

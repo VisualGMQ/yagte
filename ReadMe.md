@@ -56,3 +56,7 @@ Yet Another Geometric Tool
 |Point|Line|Segment|Ray|Triangle|Rect|Polyline|Polygon|
 |:--:|:--:|:-----:|:--:|:------:|:--:|:------:|:-----:|
 |:no_entry_sign:|||||:o:|
+
+## 一些参考
+
+[Basics of SIMD Programming](http://www.cs.uu.nl/docs/vakken/magr/2017-2018/files/SIMD%20Tutorial.pdf)

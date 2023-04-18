@@ -8,6 +8,6 @@ pub fn is_rect_contain_pt(pt: &Vec2, rect: &Rect) -> bool {
         && pt.y() <= rect.min().y() + rect.size().y()
 }
 
-pub fn is_polygon_contain_pt(pt: &Vec2, polygon: &[Vec2]) -> bool {
+pub fn is_polygon_contain_pt(_pt: &Vec2, _polygon: &[Vec2]) -> bool {
     todo!();
 }

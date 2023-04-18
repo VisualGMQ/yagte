@@ -57,11 +57,11 @@ pub fn pt2polyline_sqrd(pt: &Vec2, polyline: &[Vec2]) -> Option<f32> {
     min_dist
 }
 
-pub fn pt2polygon_sqrd(pt: &Vec2, polygon: &[Vec2]) -> f32 {
+pub fn pt2polygon_sqrd(_pt: &Vec2, _polygon: &[Vec2]) -> f32 {
     todo!();
 }
 
-pub fn pt2triangle_sqrd(pt: &Vec2, triangle: Triangle) -> f32 {
+pub fn pt2triangle_sqrd(_pt: &Vec2, _triangle: Triangle) -> f32 {
     todo!();
 }
 
@@ -91,18 +91,18 @@ pub fn ray2line_sqrd(l: &Line, ray: &Line) -> Option<f32> {
     }
 }
 
-pub fn line2seg_sqrd(l: &Line, seg: &Line) -> Option<f32> {
+pub fn line2seg_sqrd(_l: &Line, _seg: &Line) -> Option<f32> {
     todo!();
 }
 
-pub fn seg2seg_sqrd(s1: &Line, s2: &Line) -> Option<f32> {
+pub fn seg2seg_sqrd(_s1: &Line, _s2: &Line) -> Option<f32> {
     todo!();
 }
 
-pub fn ray2ray_sqrd(r1: &Line, r2: &Line) -> Option<f32> {
+pub fn ray2ray_sqrd(_r1: &Line, _r2: &Line) -> Option<f32> {
     todo!();
 }
 
-pub fn ray2seg_sqrd(ray: &Line, seg: &Line) -> Option<f32> {
+pub fn ray2seg_sqrd(_ray: &Line, _seg: &Line) -> Option<f32> {
     todo!();
 }

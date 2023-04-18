@@ -560,13 +560,12 @@ dependencies = [
 name = "graphics"
 version = "0.1.0"
 dependencies = [
- "bytemuck",
  "env_logger",
  "geometric",
  "gl",
- "glium",
  "log",
  "math",
+ "window",
 ]
 
 [[package]]
@@ -1292,6 +1291,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
 
 [[package]]
+name = "visual-debugger"
+version = "0.1.0"
+dependencies = [
+ "env_logger",
+ "geometric",
+ "glium",
+ "graphics",
+ "log",
+ "math",
+ "window",
+]
+
+[[package]]
 name = "wasi"
 version = "0.11.0+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1474,6 +1486,17 @@ name = "winapi-x86_64-pc-windows-gnu"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
+
+[[package]]
+name = "window"
+version = "0.1.0"
+dependencies = [
+ "env_logger",
+ "gl",
+ "glium",
+ "log",
+ "math",
+]
 
 [[package]]
 name = "windows-sys"
@@ -1726,13 +1749,3 @@ name = "xml-rs"
 version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2d7d3948613f75c98fd9328cfdcc45acc4d360655289d0a7d4ec931392200a3"
-
-[[package]]
-name = "yagt"
-version = "0.1.0"
-dependencies = [
- "geometric",
- "graphics",
- "log",
- "math",
-]
