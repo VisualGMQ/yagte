@@ -3,14 +3,14 @@ use crate::{
     glhelper::{GLErrorType, GLResult},
 };
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ShaderType {
     Vertex,
     Fragment,
 }
 
-pub struct ShaderUnit {
-    stype: ShaderType,
+pub struct ShaderModule {
+    pub stype: ShaderType,
     id: u32,
 }
 
@@ -21,7 +21,7 @@ fn shadertype2glenum(t: ShaderType) -> u32 {
     }
 }
 
-impl ShaderUnit {
+impl ShaderModule {
     pub fn new(t: ShaderType, source: &str) -> GLResult<Self> {
         let id = gl_call!(gl::CreateShader(shadertype2glenum(t)))?;
         if id == 0 {
@@ -55,7 +55,7 @@ impl ShaderUnit {
     }
 }
 
-impl Drop for ShaderUnit {
+impl Drop for ShaderModule {
     fn drop(&mut self) {
         gl_call!(gl::DeleteShader(self.id)).unwrap();
     }
@@ -66,7 +66,7 @@ pub struct Shader {
 }
 
 impl Shader {
-    pub fn new(vertex_shader: &ShaderUnit, frag_shader: &ShaderUnit) -> GLResult<Self> {
+    pub fn new(vertex_shader: &ShaderModule, frag_shader: &ShaderModule) -> GLResult<Self> {
         let id = gl_call!(gl::CreateProgram())?;
         if id == 0 {
             return Err(GLErrorType::CreateShaderProgramFailed);

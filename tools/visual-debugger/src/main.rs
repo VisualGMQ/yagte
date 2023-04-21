@@ -1,5 +1,5 @@
 use geometric::geom3d::Frustum;
-use graphics::{camera};
+use graphics::camera;
 
 use window::{
     app::AppBuilder,

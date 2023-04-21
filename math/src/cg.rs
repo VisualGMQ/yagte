@@ -267,9 +267,9 @@ fn create_y_rotation(radians: f32) -> Mat44 {
     let s = radians.sin();
     let c = radians.cos();
     Mat44::from_row(&[
-          c, 0.0,  -s, 0.0,
+          c, 0.0,   s, 0.0,
         0.0, 1.0, 0.0, 0.0,
-          s, 0.0,   c, 0.0,
+         -s, 0.0,   c, 0.0,
         0.0, 0.0, 0.0, 1.0,
     ])
 }

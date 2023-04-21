@@ -3,8 +3,8 @@ use crate::camera;
 use crate::gl_call;
 use crate::glhelper::GLResult;
 use crate::shader::Shader;
+use crate::shader::ShaderModule;
 use crate::shader::ShaderType;
-use crate::shader::ShaderUnit;
 use crate::vertex_attr::*;
 use gl;
 use math;
@@ -68,8 +68,8 @@ impl Renderer {
         });
 
         let shader = Shader::new(
-            &ShaderUnit::new(ShaderType::Vertex, VERTEX_SHADER_CODE)?,
-            &ShaderUnit::new(ShaderType::Fragment, FRAG_SHADER_CODE)?,
+            &ShaderModule::new(ShaderType::Vertex, VERTEX_SHADER_CODE)?,
+            &ShaderModule::new(ShaderType::Fragment, FRAG_SHADER_CODE)?,
         )?;
 
         gl_call!(gl::Viewport(0, 0, w, h))?;
@@ -124,6 +124,87 @@ impl Renderer {
             gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT | gl::STENCIL_BUFFER_BIT
         ))
         .unwrap();
+    }
+
+    pub fn draw_lines(
+        &mut self,
+        vertices: &[math::matrix::Vec3],
+        model: &math::matrix::Mat44,
+        color: &math::matrix::Vec4,
+    ) -> GLResult<()> {
+        self.vao.bind()?;
+
+        self.vbo.bind()?;
+        let (_, datas, _) = unsafe { vertices.align_to::<u8>() };
+        self.vbo.buffer_data(datas)?;
+
+        self.shader.use_shader()?;
+        self.shader.set_mat4("project", self.camera.get_project())?;
+        self.shader.set_mat4("view", self.camera.get_view())?;
+        self.shader.set_mat4("model", model)?;
+        self.shader.set_vec4("color", color)?;
+
+        gl_call!(gl::DrawArrays(
+            gl::LINES,
+            0,
+            vertices.len().try_into().unwrap()
+        ))?;
+
+        Ok(())
+    }
+
+    pub fn draw_linestrip(
+        &mut self,
+        vertices: &[math::matrix::Vec3],
+        model: &math::matrix::Mat44,
+        color: &math::matrix::Vec4,
+    ) -> GLResult<()> {
+        self.vao.bind()?;
+
+        self.vbo.bind()?;
+        let (_, datas, _) = unsafe { vertices.align_to::<u8>() };
+        self.vbo.buffer_data(datas)?;
+
+        self.shader.use_shader()?;
+        self.shader.set_mat4("project", self.camera.get_project())?;
+        self.shader.set_mat4("view", self.camera.get_view())?;
+        self.shader.set_mat4("model", model)?;
+        self.shader.set_vec4("color", color)?;
+
+        gl_call!(gl::DrawArrays(
+            gl::LINE_STRIP,
+            0,
+            vertices.len().try_into().unwrap()
+        ))?;
+
+        Ok(())
+    }
+
+    pub fn draw_lineloop(
+        &mut self,
+        vertices: &[math::matrix::Vec3],
+        model: &math::matrix::Mat44,
+        color: &math::matrix::Vec4,
+    ) -> GLResult<()> {
+        self.vao.bind()?;
+
+        self.vbo.bind()?;
+        let (_, datas, _) = unsafe { vertices.align_to::<u8>() };
+        self.vbo.buffer_data(datas)?;
+
+        self.shader.use_shader()?;
+        self.shader.set_mat4("project", self.camera.get_project())?;
+        self.shader.set_mat4("view", self.camera.get_view())?;
+        self.shader.set_mat4("model", model)?;
+        self.shader.set_vec4("color", color)?;
+
+        gl_call!(gl::DrawArrays(
+            gl::LINE_LOOP,
+            0,
+            vertices.len().try_into().unwrap()
+        ))?;
+
+        Ok(())
     }
 
     pub fn draw_arrays(

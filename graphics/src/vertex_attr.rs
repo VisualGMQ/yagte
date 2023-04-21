@@ -61,8 +61,6 @@ impl AttrBunch {
     }
 }
 
-
-
 pub struct AttrBunchIterator<'a> {
     bunch: &'a AttrBunch,
     index: usize,

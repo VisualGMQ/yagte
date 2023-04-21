@@ -1,6 +1,11 @@
 pub mod buffer;
 pub mod camera;
+pub mod command;
+pub mod error;
 mod glhelper;
+mod graphics_pipeline;
+pub mod physical_device;
+pub mod pipeline;
 pub mod renderer;
 pub mod shader;
 pub mod vertex_attr;

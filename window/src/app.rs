@@ -43,8 +43,12 @@ where
     F: 'static + FnMut(&Event<'_, ()>, &EventLoopWindowTarget<()>, &mut ControlFlow),
 {
     app.event_loop.run(move |events, event_loop, control_flow| {
-        if let Event::WindowEvent { event: WindowEvent::Resized(physical_size), .. } = &events {
-                app.gl_context.resize(*physical_size);
+        if let Event::WindowEvent {
+            event: WindowEvent::Resized(physical_size),
+            ..
+        } = &events
+        {
+            app.gl_context.resize(*physical_size);
         }
 
         handler(&events, event_loop, control_flow);

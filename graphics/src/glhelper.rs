@@ -1,5 +1,3 @@
-
-
 #[derive(Debug, PartialEq)]
 pub enum GLErrorType {
     NoError = 0,
