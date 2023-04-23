@@ -19,6 +19,7 @@ pub enum GLErrorType {
     CreateVertexAttributeFailed,
     CreateBufferFailed,
     InvalidCStr,
+    InvalidPipeline,
 
     Unknown,
 }

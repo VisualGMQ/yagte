@@ -1,77 +1,59 @@
-use crate::{error, gl_call, glhelper::GLResult, pipeline::*};
+use crate::{pipeline::*, buffer::Buffer};
 
-pub enum CommandType {
-    DrawArrays,
+pub(crate) enum DrawType {
+    Arrays,
+    Elements,
 }
 
-pub struct Command {}
-
-impl Command {
-    pub fn bind_pipeline(&self, pipeline: &Pipeline) -> Result<(), error::Error> {
-        match pipeline {
-            Pipeline::Graphics(pipeline) => self.bind_graphics_pipeline(pipeline),
-        }
-    }
-
-    fn bind_graphics_pipeline(&self, pipeline: &GraphicsPipeline) -> Result<(), error::Error> {
-        self.bind_gl_graphics_pipeline(pipeline)
-            .map_err(|_| error::Error::BindPipelineFailed)
-    }
-
-    fn bind_gl_graphics_pipeline(&self, pipeline: &GraphicsPipeline) -> GLResult<()> {
-        gl_call!(gl::Viewport(
-            pipeline.viewport.x,
-            pipeline.viewport.y,
-            pipeline.viewport.w,
-            pipeline.viewport.h
-        ))?;
-
-        if pipeline.multisample.enable {
-            gl_call!(gl::Enable(gl::MULTISAMPLE))?;
-        } else {
-            gl_call!(gl::Disable(gl::MULTISAMPLE))?;
-        }
-
-        let raster = &pipeline.raster;
-        let face_cull = cullface2glenum(raster.face_cull);
-        match face_cull {
-            Some(cull) => {
-                gl_call!(gl::Enable(gl::CULL_FACE))?;
-                gl_call!(gl::CullFace(cull))?;
-            }
-            None => {
-                gl_call!(gl::Disable(gl::CULL_FACE))?;
-            }
-        }
-
-        gl_call!(gl::FrontFace(frontface2glenum(raster.front_face)))?;
-        gl_call!(gl::PolygonMode(
-            gl::FRONT_AND_BACK,
-            polygonmod2glenum(raster.polygon_mode)
-        ))?;
-        Ok(())
-    }
+pub(crate) struct DrawInfo {
+    pub(crate) dtype: DrawType,
+    pub(crate) offset: i32,
+    pub(crate) count: i32,
 }
 
-fn cullface2glenum(face_cull: FaceCull) -> Option<u32> {
-    match face_cull {
-        FaceCull::None => None,
-        FaceCull::Front => Some(gl::FRONT),
-        FaceCull::Back => Some(gl::BACK),
-    }
+pub struct Command<'a> {
+    pub(crate) draw_info: Option<DrawInfo>,
+    pub(crate) pipeline: Option<&'a Pipeline>,
+    pub(crate) vertex_buffer: Option<&'a Buffer>,
+    pub(crate) index_buffer: Option<&'a Buffer>,
 }
 
-fn frontface2glenum(face: FrontFace) -> u32 {
-    match face {
-        FrontFace::CW => gl::CW,
-        FrontFace::CCW => gl::CCW,
+impl<'a> Command<'a> {
+    pub fn new() -> Self {
+        Self { draw_info: None, pipeline: None, vertex_buffer: None, index_buffer: None }
     }
-}
 
-fn polygonmod2glenum(mode: PolygonMode) -> u32 {
-    match mode {
-        PolygonMode::Point => gl::POINT,
-        PolygonMode::Line => gl::LINE,
-        PolygonMode::Fill => gl::FILL,
+    pub fn bind_pipeline(&mut self, pipeline: &'a Pipeline) {
+        self.pipeline = Some(pipeline);
+    }
+    
+    pub fn draw_arrays(&mut self, first: i32, count: i32) {
+        self.draw_info = Some(DrawInfo {
+            offset: first,
+            dtype: DrawType::Arrays,
+            count,
+        });
+    }
+
+    pub fn draw_elements(&mut self, count: i32, offset: i32) {
+        self.draw_info = Some(DrawInfo {
+            dtype: DrawType::Elements,
+            offset,
+            count,
+        });
+    }
+
+    pub fn bind_vertex_buffer(&mut self, buffer: &'a Buffer) {
+        self.vertex_buffer = Some(buffer);
+    }
+
+    pub fn bind_indices_buffer(&mut self, buffer: &'a Buffer) {
+        self.index_buffer = Some(buffer);
+    }
+
+    pub fn reset(&mut self) {
+        self.vertex_buffer = None;
+        self.index_buffer = None;
+        self.pipeline = None;
     }
 }

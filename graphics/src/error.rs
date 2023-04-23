@@ -3,4 +3,6 @@ pub enum Error {
     ParamNotEnough,
     BindPipelineFailed,
     InvalidCStr,
+    InvalidCommand,
+    CommandExecuteFailed,
 }

@@ -141,3 +141,35 @@ impl<'a> PipelineBuilder<'a> {
         })
     }
 }
+
+pub(crate) fn cullface2glenum(face_cull: FaceCull) -> Option<u32> {
+    match face_cull {
+        FaceCull::None => None,
+        FaceCull::Front => Some(gl::FRONT),
+        FaceCull::Back => Some(gl::BACK),
+    }
+}
+
+pub(crate) fn frontface2glenum(face: FrontFace) -> u32 {
+    match face {
+        FrontFace::CW => gl::CW,
+        FrontFace::CCW => gl::CCW,
+    }
+}
+
+pub(crate) fn polygonmod2glenum(mode: PolygonMode) -> u32 {
+    match mode {
+        PolygonMode::Point => gl::POINT,
+        PolygonMode::Line => gl::LINE,
+        PolygonMode::Fill => gl::FILL,
+    }
+}
+
+pub(crate) fn topology2glenum(topology: Topology) -> u32 {
+    match topology {
+        Topology::Triangles => gl::TRIANGLES,
+        Topology::Lines => gl::LINES,
+        Topology::LineStrip => gl::LINE_STRIP,
+        Topology::LineLoop => gl::LINE_LOOP,
+    }
+}
