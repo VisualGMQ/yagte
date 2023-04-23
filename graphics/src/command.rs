@@ -9,16 +9,16 @@ pub struct Command {}
 impl Command {
     pub fn bind_pipeline(&self, pipeline: &Pipeline) -> Result<(), error::Error> {
         match pipeline {
-            Pipeline::Graphics(pipeline) => self.apply_graphics_pipeline(pipeline),
+            Pipeline::Graphics(pipeline) => self.bind_graphics_pipeline(pipeline),
         }
     }
 
-    fn apply_graphics_pipeline(&self, pipeline: &GraphicsPipeline) -> Result<(), error::Error> {
-        self.apply_gl_graphics_pipeline(pipeline)
+    fn bind_graphics_pipeline(&self, pipeline: &GraphicsPipeline) -> Result<(), error::Error> {
+        self.bind_gl_graphics_pipeline(pipeline)
             .map_err(|_| error::Error::BindPipelineFailed)
     }
 
-    fn apply_gl_graphics_pipeline(&self, pipeline: &GraphicsPipeline) -> GLResult<()> {
+    fn bind_gl_graphics_pipeline(&self, pipeline: &GraphicsPipeline) -> GLResult<()> {
         gl_call!(gl::Viewport(
             pipeline.viewport.x,
             pipeline.viewport.y,

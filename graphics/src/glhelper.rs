@@ -18,6 +18,7 @@ pub enum GLErrorType {
     CreateShaderFailed,
     CreateVertexAttributeFailed,
     CreateBufferFailed,
+    InvalidCStr,
 
     Unknown,
 }

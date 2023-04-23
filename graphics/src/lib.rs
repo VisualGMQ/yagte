@@ -9,3 +9,4 @@ pub mod pipeline;
 pub mod renderer;
 pub mod shader;
 pub mod vertex_attr;
+pub mod renderpass;
