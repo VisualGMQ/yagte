@@ -291,6 +291,34 @@ impl<const COL: usize, const ROW: usize> Matrix<f32, COL, ROW> {
     }
 }
 
+impl<T: ArithmeticGroup<T>> Matrix<T, 4, 4> {
+    pub fn from_coordination(
+        x: Vector3<T>,
+        y: Vector3<T>,
+        z: Vector3<T>,
+        position: Vector3<T>,
+    ) -> Self {
+        Self::from_row(&[
+            x.x(),
+            x.y(),
+            x.z(),
+            -x.dot(&position),
+            y.x(),
+            y.y(),
+            y.z(),
+            -y.dot(&position),
+            z.x(),
+            z.y(),
+            z.z(),
+            -z.dot(&position),
+            T::zero(),
+            T::zero(),
+            T::zero(),
+            T::identity(),
+        ])
+    }
+}
+
 pub type ColVector<T, const LEN: usize> = Matrix<T, 1, LEN>;
 pub type RowVector<T, const LEN: usize> = Matrix<T, LEN, 1>;
 
@@ -370,6 +398,13 @@ pub type Vector3<T> = Vector<T, 3>;
 pub type Vector4<T> = Vector<T, 4>;
 
 impl<T: ArithmeticGroup<T>> Vector2<T> {
+    pub fn x_axis() -> Self {
+        Self::from_xy(T::identity(), T::zero())
+    }
+    pub fn y_axis() -> Self {
+        Self::from_xy(T::zero(), T::identity())
+    }
+
     pub fn from_xy(x: T, y: T) -> Self {
         Self::new([x, y])
     }
@@ -400,6 +435,14 @@ impl<T: ArithmeticGroup<T>> Vector3<T> {
 
     pub fn from_xyz(x: T, y: T, z: T) -> Self {
         Self::new([x, y, z])
+    }
+
+    pub fn from_vec2(v: Vector2<T>) -> Self {
+        Self::from_xyz(v.x(), v.y(), T::identity())
+    }
+
+    pub fn from_vec4(v: Vector4<T>) -> Self {
+        Self::from_xyz(v.x(), v.y(), v.z())
     }
 
     pub fn x(&self) -> T {
@@ -470,6 +513,30 @@ impl<T: ArithmeticGroup<T>> Vector4<T> {
 
     pub fn xyz(&self) -> Vector3<T> {
         Vector3::from_xyz(self.x(), self.y(), self.z())
+    }
+}
+
+impl<T: ArithmeticGroup<T>> From<Vector3<T>> for Vector4<T> {
+    fn from(value: Vector3<T>) -> Self {
+        Self::from_xyzw(value.x(), value.y(), value.z(), T::identity())
+    }
+}
+
+impl<T: ArithmeticGroup<T>> From<Vector2<T>> for Vector4<T> {
+    fn from(value: Vector2<T>) -> Self {
+        Self::from_xyzw(value.x(), value.y(), T::zero(), T::identity())
+    }
+}
+
+impl<T: ArithmeticGroup<T>> From<Vector2<T>> for Vector3<T> {
+    fn from(value: Vector2<T>) -> Self {
+        Self::from_xyz(value.x(), value.y(), T::zero())
+    }
+}
+
+impl<T: ArithmeticGroup<T>> From<Vector4<T>> for Vector3<T> {
+    fn from(value: Vector4<T>) -> Self {
+        Self::from_xyz(value.x(), value.y(), value.z())
     }
 }
 

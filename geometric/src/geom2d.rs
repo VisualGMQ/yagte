@@ -133,4 +133,24 @@ impl Rect {
     }
 }
 
+#[derive(Clone, Copy, Debug)]
+pub struct Ellipse {
+    pub a: f32,
+    pub b: f32,
+    pub position: Vec2,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct Parabola {
+    pub p: f32,
+    pub position: Vec2,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct Hyperbola {
+    pub a: f32,
+    pub b: f32,
+    pub position: Vec2,
+}
+
 // TODO: implement ellipse, B-Splin, Bezier Curve
