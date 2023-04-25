@@ -49,7 +49,7 @@ pub enum LinearLine {
 }
 
 pub struct Triangle {
-    pts: [Vec2; 3],
+    pub pts: [Vec2; 3],
 }
 
 impl Triangle {
@@ -79,21 +79,13 @@ impl IndexMut<usize> for Triangle {
 }
 
 pub struct Circle {
-    center: Vec2,
-    radius: f32,
+    pub center: Vec2,
+    pub radius: f32,
 }
 
 impl Circle {
     pub fn new(center: Vec2, radius: f32) -> Circle {
         Circle { center, radius }
-    }
-
-    pub fn center(&self) -> &Vec2 {
-        &self.center
-    }
-
-    pub fn radius(&self) -> f32 {
-        self.radius
     }
 
     pub fn is_contain_pt(&self, pt: &Vec2) -> bool {
@@ -102,8 +94,8 @@ impl Circle {
 }
 
 pub struct Rect {
-    min: Vec2,
-    size: Vec2,
+    pub min: Vec2,
+    pub size: Vec2,
 }
 
 impl Rect {

@@ -534,6 +534,12 @@ impl<T: ArithmeticGroup<T>> From<Vector2<T>> for Vector3<T> {
     }
 }
 
+impl<T: ArithmeticGroup<T>> From<Vector3<T>> for Vector2<T> {
+    fn from(value: Vector3<T>) -> Self {
+        Self::from_xy(value.x(), value.y())
+    }
+}
+
 impl<T: ArithmeticGroup<T>> From<Vector4<T>> for Vector3<T> {
     fn from(value: Vector4<T>) -> Self {
         Self::from_xyz(value.x(), value.y(), value.z())

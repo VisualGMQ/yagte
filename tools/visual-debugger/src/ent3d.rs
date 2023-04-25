@@ -1,4 +1,6 @@
-use geometric::geom3d::*;
+use std::f32::consts::PI;
+
+use geometric::{geom3d::*, geom2d::Circle};
 use math::matrix::*;
 
 pub struct FaceDisplayData {
@@ -134,18 +136,65 @@ fn parabola_curve_to_display_data(
 }
 
 
-pub fn cylinder_to_display_data(cylinder: &Cylinder, color: Vec4) -> FaceDisplayData {
-    todo!()
+pub fn cylinder_to_display_data(cylinder: &Cylinder, color: Vec4, slice: u32) -> FaceDisplayData {
+    truncatedcone_to_display_data(&TruncatedCone { bottom: cylinder.bottom, bottom_radius: cylinder.radius, top_radius: cylinder.radius, dir: cylinder.dir, height: cylinder.height }, color, slice)
 }
 
-pub fn cone_to_display_data(cone: &Cone, color: Vec4) -> FaceDisplayData {
-    todo!()
+pub fn cone_to_display_data(cone: &Cone, color: Vec4, slice: u32) -> FaceDisplayData {
+    let mut circle_data = circle_to_display_data(&Circle { center: Vec2::from_xy(cone.bottom.x(), cone.bottom.z()), radius: cone.bottom_radius }, color, slice);
+    let top = cone.bottom + cone.dir * cone.height;
+
+    let mut vertices: Vec<Vec3> = Vec::new();
+    let mut indices: Vec<u32> = Vec::new();
+
+    vertices.append(&mut circle_data.vertices);
+    vertices.push(top);
+    indices.append(&mut circle_data.indices);
+
+    let last_idx = vertices.len() as u32 - 1;
+    for i in 0..slice {
+        indices.extend([last_idx, i, (i + 1) % slice].iter());
+    }
+
+    // TODO: normals not calculated
+    FaceDisplayData { vertices, normals: vec![], indices, color }
 }
 
-pub fn truncatedcone_to_display_data(cone: &TruncatedCone, color: Vec4) -> FaceDisplayData {
-    todo!()
+pub fn truncatedcone_to_display_data(cone: &TruncatedCone, color: Vec4, slice: u32) -> FaceDisplayData {
+    let mut bottom = circle_to_display_data(&Circle { center: Vec2::from_xy(cone.bottom.x(), cone.bottom.z()), radius: cone.bottom_radius }, color, slice);
+    let top = circle_to_display_data(&Circle { center: Vec2::from_xy(cone.bottom.x(), cone.bottom.z()), radius: cone.top_radius}, color, slice);
+
+    let mut vertices: Vec<Vec3> = Vec::new();
+    let mut indices: Vec<u32> = Vec::new();
+
+    vertices.append(&mut bottom.vertices);
+    indices.append(&mut bottom.indices);
+    vertices.append(&mut top.vertices.iter().map(|v| *v + cone.dir * cone.height).collect());
+    indices.append(&mut top.indices.iter().map(|i| *i + slice).collect());
+
+    for i in 0..slice {
+        indices.extend([i, i + slice, (i + 1) % slice].iter());
+        indices.extend([i + 1, i + slice, (i + slice + 1) % (slice * 2)].iter());
+    }
+
+    FaceDisplayData { vertices, normals: vec![], indices, color }
 }
 
-pub fn cylinderlike_to_display_data(like: &CylinderLike, color: Vec4) -> FaceDisplayData {
-    todo!()
+pub fn cylinderlike_to_display_data(like: &CylinderLike, color: Vec4, slice: u32) -> FaceDisplayData {
+    match &like {
+        CylinderLike::Cylinder(c) => cylinder_to_display_data(c, color, slice),
+        CylinderLike::Cone(c) => cone_to_display_data(c, color, slice),
+        CylinderLike::TruncatedCone(c) => truncatedcone_to_display_data(c, color, slice),
+    }
+}
+
+pub fn circle_to_display_data<'a>(circle: &Circle, color: Vec4, slice: u32) -> FaceDisplayData {
+    let deg_step = 2.0 * PI / slice as f32;
+    let polygon = Polygon{ points: (0..slice).map(|i| {
+        let i = i as f32;
+        let deg = i * deg_step;
+        Vec3::from_xyz(circle.center.x(), 0.0, circle.center.y()) + Vec3::from_xyz(deg.cos() * circle.radius, 0.0, deg.sin() * circle.radius)
+    }).collect()};
+
+    plane_to_display_data(&polygon, color).unwrap()
 }

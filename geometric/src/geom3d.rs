@@ -2,8 +2,6 @@ use std::ops::{Index, IndexMut};
 
 use math::{coord::Cartesian3D, matrix::*};
 
-use crate::geom2d::Circle;
-
 pub struct Triangle {
     pts: [Vec3; 3],
 }
@@ -230,21 +228,24 @@ impl ConicArcInPolar {
 
 pub struct Cylinder {
     pub bottom: Vec3,
-    pub dir: Vec3,
+    pub dir: Vec3, // normalized
+    pub height: f32,
     pub radius: f32,
 }
 
 pub struct Cone {
     pub bottom: Vec3,
     pub bottom_radius: f32,
-    pub dir: Vec3,
+    pub dir: Vec3, // normalized
+    pub height: f32,
 }
 
 pub struct TruncatedCone {
     pub bottom: Vec3,
     pub bottom_radius: f32,
     pub top_radius: f32,
-    pub dir: Vec3,
+    pub dir: Vec3, // normalized
+    pub height: f32,
 }
 
 pub enum CylinderLike {

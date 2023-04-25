@@ -10,6 +10,14 @@ Yet Another Geometric Tool
 * :heavy_check_mark: : 编写完成，测试通过
 * :no_entry_sign: : 无需完成
 
+### 网格体生成
+
+|Cylinder|TruncatedCone|Cone|Polygon|Ellipse|Parabola|Hyperbola|
+|:------:|:-----------:|:--:|:-----:|:-----:|:------:|:-------:|
+|:heavy_check_mark:|:heavy_check_mark:|:heavy_check_mark:|:heavy_check_mark:|:o:|:o:|:o:|
+
+![mesh_generate](./snapshot/mesh_generate.png)
+
 ### 计算几何部分
 
 2D求最短距离：
