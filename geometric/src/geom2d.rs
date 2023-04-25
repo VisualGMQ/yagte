@@ -145,4 +145,12 @@ pub struct Hyperbola {
     pub position: Vec2,
 }
 
-// TODO: implement ellipse, B-Splin, Bezier Curve
+pub struct CircleArc {
+    pub radius: f32,
+    pub center: Vec3,
+    pub norm: Vec3,
+    pub x_axis: Vec3,
+    pub range: (f32, f32),
+}
+
+// TODO: implement B-Splin, Bezier Curve

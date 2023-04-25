@@ -1,8 +1,12 @@
-use geometric::{geom3d::*};
+use geometric::geom3d::*;
 use raylib::prelude::*;
 use visual_debugger::ent3d::*;
 
-fn draw_mesh(mode: &mut RaylibMode3D<RaylibDrawHandle>, position: ::math::matrix::Vec3, display_data: &FaceDisplayData) {
+fn draw_mesh(
+    mode: &mut RaylibMode3D<RaylibDrawHandle>,
+    position: ::math::matrix::Vec3,
+    display_data: &FaceDisplayData,
+) {
     for indices in display_data.indices.chunks(3) {
         for i in 0..indices.len() {
             let p1 = display_data.vertices[indices[i] as usize] + position;
@@ -40,7 +44,7 @@ fn main() {
     let cone = Cone {
         bottom: ::math::matrix::Vec3::zeros(),
         bottom_radius: 1.0,
-        dir: ::math::matrix::Vec3::y_axis(),
+        dir: ::math::matrix::Vec3::z_axis(),
         height: 1.0,
     };
 
@@ -54,7 +58,7 @@ fn main() {
         bottom: ::math::matrix::Vec3::zeros(),
         bottom_radius: 1.0,
         top_radius: 0.5,
-        dir: ::math::matrix::Vec3::y_axis(),
+        dir: ::math::matrix::Vec3::z_axis(),
         height: 1.0,
     };
 
@@ -67,7 +71,7 @@ fn main() {
     let cylinder = Cylinder {
         bottom: ::math::matrix::Vec3::zeros(),
         radius: 1.0,
-        dir: ::math::matrix::Vec3::y_axis(),
+        dir: ::math::matrix::Vec3::z_axis(),
         height: 1.0,
     };
 
@@ -102,7 +106,15 @@ fn main() {
 
         // draw_mesh(&mut mode, &display_data);
         draw_mesh(&mut mode, ::math::matrix::Vec3::zeros(), &cone_display_data);
-        draw_mesh(&mut mode, ::math::matrix::Vec3::from_xyz(2.0, 0.0, 0.0), &cylinder_display_data);
-        draw_mesh(&mut mode, ::math::matrix::Vec3::from_xyz(4.0, 0.0, 0.0), &truncated_cone_display_data);
+        draw_mesh(
+            &mut mode,
+            ::math::matrix::Vec3::from_xyz(2.0, 0.0, 0.0),
+            &cylinder_display_data,
+        );
+        draw_mesh(
+            &mut mode,
+            ::math::matrix::Vec3::from_xyz(4.0, 0.0, 0.0),
+            &truncated_cone_display_data,
+        );
     }
 }
