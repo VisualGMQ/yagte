@@ -12,3 +12,4 @@ raylib = "3.7.0"
 
 math = {path = "../../math"}
 geometric = {path = "../../geometric"}
+graphics = {path = "../../graphics"}

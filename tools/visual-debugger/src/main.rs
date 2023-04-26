@@ -1,6 +1,6 @@
 use geometric::geom3d::*;
 use raylib::prelude::*;
-use visual_debugger::ent3d::*;
+use graphics::mesh_generate::*;
 
 fn draw_mesh(
     mode: &mut RaylibMode3D<RaylibDrawHandle>,
