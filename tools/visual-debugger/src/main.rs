@@ -1,6 +1,6 @@
 use geometric::geom3d::*;
-use raylib::prelude::*;
 use graphics::mesh_generate::*;
+use raylib::prelude::*;
 
 fn draw_mesh(
     mode: &mut RaylibMode3D<RaylibDrawHandle>,
@@ -58,7 +58,7 @@ fn main() {
         bottom: ::math::matrix::Vec3::zeros(),
         bottom_radius: 1.0,
         top_radius: 0.5,
-        dir: ::math::matrix::Vec3::z_axis(),
+        dir: ::math::matrix::Vec3::from_xyz(0.0, 0.0, 1.0),
         height: 1.0,
     };
 
@@ -71,7 +71,7 @@ fn main() {
     let cylinder = Cylinder {
         bottom: ::math::matrix::Vec3::zeros(),
         radius: 1.0,
-        dir: ::math::matrix::Vec3::z_axis(),
+        dir: ::math::matrix::Vec3::from_xyz(0.0, 1.0, 1.0),
         height: 1.0,
     };
 
@@ -113,7 +113,7 @@ fn main() {
         );
         draw_mesh(
             &mut mode,
-            ::math::matrix::Vec3::from_xyz(4.0, 0.0, 0.0),
+            ::math::matrix::Vec3::from_xyz(6.0, 0.0, 0.0),
             &truncated_cone_display_data,
         );
     }

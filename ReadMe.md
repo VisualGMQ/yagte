@@ -37,7 +37,7 @@ Yet Another Geometric Tool
 
 ||Point|Line|Segment|Ray|Triangle|Rect|Polyline|Polygon|
 |:-|:--:|:--:|:-----:|:--:|:------:|:--:|:------:|:-----:|
-|Point|:no_entry_sign:|:o:|:o:|:o:||:o:|
+|Point|:no_entry_sign:|:heavy_check_mark:|:heavy_check_mark:|:heavy_check_mark:||:heavy_check_mark:|
 |Line|||||||
 |Segment|||||||
 |Ray|||||||

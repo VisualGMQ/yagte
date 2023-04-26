@@ -1,7 +1,7 @@
 use std::f32::consts::PI;
 
 use geometric::{geom2d::Circle, geom3d::*};
-use math::matrix::*;
+use math::{matrix::*, coord::Cartesian3D};
 
 pub struct FaceDisplayData {
     pub vertices: Vec<Vec3>,
@@ -186,22 +186,8 @@ pub fn truncatedcone_to_display_data(
     color: Vec4,
     slice: u32,
 ) -> FaceDisplayData {
-    let mut bottom = circle_to_display_data(
-        &Circle {
-            center: cone.bottom.into(),
-            radius: cone.bottom_radius,
-        },
-        color,
-        slice,
-    );
-    let top = circle_to_display_data(
-        &Circle {
-            center: cone.bottom.into(),
-            radius: cone.top_radius,
-        },
-        color,
-        slice,
-    );
+    let mut bottom = origin_circle_to_display_data(cone.bottom_radius, color, slice);
+    let top  = origin_circle_to_display_data(cone.top_radius, color, slice);
 
     let mut vertices: Vec<Vec3> = Vec::new();
     let mut indices: Vec<u32> = Vec::new();
@@ -212,7 +198,7 @@ pub fn truncatedcone_to_display_data(
         &mut top
             .vertices
             .iter()
-            .map(|v| *v + cone.dir * cone.height)
+            .map(|v| *v + Vec3::z_axis() * cone.height)
             .collect(),
     );
     indices.append(&mut top.indices.iter().map(|i| *i + slice).collect());
@@ -221,6 +207,16 @@ pub fn truncatedcone_to_display_data(
         indices.extend([i, i + slice, (i + 1) % slice].iter());
         indices.extend([i + 1, i + slice, (i + slice + 1) % (slice * 2)].iter());
     }
+
+    let x_axis = (geometric::misc::get_arbitrary_from_plane(&Vec3::z_axis(), &cone.bottom) - cone.bottom).normalize();
+    let y_axis = cone.dir.cross(&x_axis).normalize();
+    let x_axis = y_axis.cross(&cone.dir).normalize();
+
+    let cart = Cartesian3D::new(x_axis, y_axis, cone.dir, cone.bottom);
+    for v in &mut vertices {
+        *v = cart.transform(*v);
+    }
+    
 
     FaceDisplayData {
         vertices,
@@ -253,6 +249,20 @@ pub fn circle_to_display_data(circle: &Circle, color: Vec4, slice: u32) -> FaceD
                     + Vec3::from_xyz(deg.cos() * circle.radius, deg.sin() * circle.radius, 0.0)
             })
             .collect(),
+    };
+
+    plane_to_display_data(&polygon, color).unwrap()
+}
+
+pub fn origin_circle_to_display_data(radius: f32, color: Vec4, slice: u32) -> FaceDisplayData {
+    let deg_step = 2.0 * PI / slice as f32;
+    let polygon = Polygon { points: (0..slice)
+        .map(|i| {
+            let i = i as f32;
+            let deg = i * deg_step;
+            Vec3::from_xyz(deg.cos() * radius, deg.sin() * radius, 0.0)
+        })
+        .collect(),
     };
 
     plane_to_display_data(&polygon, color).unwrap()

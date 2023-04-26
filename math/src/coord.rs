@@ -36,10 +36,10 @@ impl Cartesian3D {
             position,
             mat: Mat44::from_coordination(x, y, z, position),
             inv_mat: Mat44::from_row(&[
-            a.x(), a.y(), a.z(), a.dot(&position),
-            b.x(), b.y(), b.z(), b.dot(&position),
-            c.x(), c.y(), c.z(), c.dot(&position),
-              0.0,   0.0,   0.0,              1.0,
+            a.x(), a.y(), a.z(), -a.dot(&position),
+            b.x(), b.y(), b.z(), -b.dot(&position),
+            c.x(), c.y(), c.z(), -c.dot(&position),
+              0.0,   0.0,   0.0,               1.0,
         ])
         }
     }

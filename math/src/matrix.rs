@@ -291,6 +291,7 @@ impl<const COL: usize, const ROW: usize> Matrix<f32, COL, ROW> {
     }
 }
 
+#[rustfmt::skip]
 impl<T: ArithmeticGroup<T>> Matrix<T, 4, 4> {
     pub fn from_coordination(
         x: Vector3<T>,
@@ -299,22 +300,10 @@ impl<T: ArithmeticGroup<T>> Matrix<T, 4, 4> {
         position: Vector3<T>,
     ) -> Self {
         Self::from_row(&[
-            x.x(),
-            x.y(),
-            x.z(),
-            -x.dot(&position),
-            y.x(),
-            y.y(),
-            y.z(),
-            -y.dot(&position),
-            z.x(),
-            z.y(),
-            z.z(),
-            -z.dot(&position),
-            T::zero(),
-            T::zero(),
-            T::zero(),
-            T::identity(),
+                x.x(),     y.x(),     z.x(),  position.x(),
+                x.y(),     y.y(),     z.y(),  position.y(),
+                x.z(),     y.z(),     z.z(),  position.z(),
+            T::zero(), T::zero(), T::zero(), T::identity(),
         ])
     }
 }

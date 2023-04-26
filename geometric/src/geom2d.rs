@@ -1,53 +1,96 @@
-use std::ops::{Index, IndexMut};
-
 use math::matrix::*;
+use std::ops::{Deref, Index, IndexMut};
 
-pub struct Line {
-    start: Vec2,
-    dir: Vec2,
-    normal: Vec2,
+#[derive(Clone, Copy, Debug)]
+pub struct Linear {
+    pub start: Vec2,
+    pub dir: Vec2,
+    pub len: f32,
 }
 
-impl Line {
-    pub fn new(start: Vec2, dir: Vec2) -> Line {
-        Line {
-            start,
-            dir,
-            normal: if dir.y() == 0.0 {
-                Vec2::from_xy(0.0, 1.0)
-            } else {
-                Vec2::from_xy(dir.y(), -dir.x()).normalize()
-            },
+impl Linear {
+    pub fn normal(&self) -> Vec2 {
+        if self.dir.y() == 0.0 {
+            Vec2::from_xy(0.0, 1.0)
+        } else {
+            Vec2::from_xy(self.dir.y(), -self.dir.x()).normalize()
         }
     }
 
-    pub fn start(&self) -> &Vec2 {
-        &self.start
+    pub fn is_parallel_approx(&self, l: &Linear, decimal_place: u8) -> bool {
+        crate::utilitiy::approx_equal(self.dir.cross(&l.dir), 0.0, decimal_place)
     }
 
-    pub fn dir(&self) -> &Vec2 {
-        &self.dir
-    }
-
-    pub fn normal(&self) -> &Vec2 {
-        &self.normal
-    }
-
-    pub fn is_parallel_approx(&self, l: &Line, decimal_place: u8) -> bool {
-        crate::utilitiy::approx_equal(self.dir().cross(l.dir()), 0.0, decimal_place)
-    }
-
-    pub fn is_parallel(&self, l: &Line) -> bool {
-        self.dir().cross(l.dir()) == 0.0
+    pub fn is_parallel(&self, l: &Linear) -> bool {
+        self.dir.cross(&l.dir) == 0.0
     }
 }
 
-pub enum LinearLine {
-    Line(Line),
-    Segment(Line),
-    Ray(Line),
+#[derive(Clone, Copy, Debug)]
+pub struct Line(Linear);
+
+impl Deref for Line {
+    type Target = Linear;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }
 
+impl Line {
+    pub fn new(start: Vec2, dir: Vec2) -> Self {
+        Self(Linear {
+            start,
+            dir,
+            len: 1.0,
+        })
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct Segment(Linear);
+
+impl Deref for Segment {
+    type Target = Linear;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl Segment {
+    pub fn new(start: Vec2, end: Vec2) -> Self {
+        let dir = end - start;
+        Self(Linear {
+            start,
+            dir: dir.normalize(),
+            len: dir.length(),
+        })
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct Ray(Linear);
+
+impl Deref for Ray {
+    type Target = Linear;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl Ray {
+    pub fn new(start: Vec2, dir: Vec2) -> Self {
+        Self(Linear {
+            start,
+            dir,
+            len: 1.0,
+        })
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
 pub struct Triangle {
     pub pts: [Vec2; 3],
 }
@@ -78,6 +121,7 @@ impl IndexMut<usize> for Triangle {
     }
 }
 
+#[derive(Clone, Copy, Debug)]
 pub struct Circle {
     pub center: Vec2,
     pub radius: f32,
@@ -85,14 +129,13 @@ pub struct Circle {
 
 impl Circle {
     pub fn new(center: Vec2, radius: f32) -> Circle {
-        Circle { center, radius }
-    }
-
-    pub fn is_contain_pt(&self, pt: &Vec2) -> bool {
-        (*pt - self.center).length_sqrd() <= self.radius * self.radius
+        Self {
+            center, radius
+        }
     }
 }
 
+#[derive(Clone, Copy, Debug)]
 pub struct Rect {
     pub min: Vec2,
     pub size: Vec2,
@@ -120,6 +163,7 @@ impl Rect {
     pub fn min(&self) -> &Vec2 {
         &self.min
     }
+
     pub fn size(&self) -> &Vec2 {
         &self.size
     }
@@ -145,6 +189,7 @@ pub struct Hyperbola {
     pub position: Vec2,
 }
 
+#[derive(Clone, Copy, Debug)]
 pub struct CircleArc {
     pub radius: f32,
     pub center: Vec3,

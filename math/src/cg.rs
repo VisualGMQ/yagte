@@ -308,6 +308,35 @@ pub fn create_ortho_project(left: f32, right: f32, bottom: f32, top: f32, far: f
     ])
 }
 
+pub struct Berycentric {
+    alpha: f32,
+    beta: f32,
+    gamma: f32,
+}
+
+impl Berycentric {
+    pub fn new(triangle: &[Vec2; 3], pt: Vec2) -> Self {
+        let area = (triangle[1] - triangle[0]).cross(&(triangle[2] - triangle[1])).abs();
+        let area1 = (triangle[1] - pt).cross(&(triangle[2] - pt)).abs();
+        let area2 = (triangle[0] - pt).cross(&(triangle[2] - pt)).abs();
+        let area3 = (triangle[0] - pt).cross(&(triangle[1] - pt)).abs();
+
+        Self { alpha: area1 / area, beta: area2 / area, gamma: area3 / area }
+    }
+
+    pub fn alpha(&self) -> f32 {
+        self.alpha
+    }
+
+    pub fn beta(&self) -> f32 {
+        self.beta
+    }
+
+    pub fn gamma(&self) -> f32 {
+        self.gamma
+    }
+}
+
 // TODO: implement Rodriguez's formula
 // TODO: implement Mirror transform
 // TODO: implement Quaternion

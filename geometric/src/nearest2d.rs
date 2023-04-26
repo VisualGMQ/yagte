@@ -1,33 +1,33 @@
 use crate::geom2d::*;
 use math::matrix::*;
 
-pub fn pt2line_param(pt: &Vec2, line: &Line) -> f32 {
-    (*pt - *line.start()).dot(line.dir()) / line.dir().length_sqrd()
+pub fn pt2line_param(pt: &Vec2, start: &Vec2, dir: &Vec2) -> f32 {
+    (*pt - *start).dot(&dir)
 }
 
-pub fn pt2line(pt: &Vec2, line: &Line) -> Vec2 {
-    let t = pt2line_param(pt, line);
-    *line.start() + *line.dir() * t
+pub fn pt2line(pt: &Vec2, start: &Vec2, dir: &Vec2) -> Vec2 {
+    let t = pt2line_param(pt, start, dir);
+    *start + *dir * t
 }
 
-pub fn pt2ray_param(pt: &Vec2, line: &Line) -> f32 {
-    let t = pt2line_param(pt, line);
+pub fn pt2ray_param(pt: &Vec2, ray: &Ray) -> f32 {
+    let t = pt2line_param(pt, &ray.start, &ray.dir);
     t.max(0.0)
 }
 
-pub fn pt2ray(pt: &Vec2, line: &Line) -> Vec2 {
-    let t = pt2ray_param(pt, line);
-    *line.start() + *line.dir() * t
+pub fn pt2ray(pt: &Vec2, ray: &Ray) -> Vec2 {
+    let t = pt2ray_param(pt, ray);
+    ray.start + ray.dir * t
 }
 
-pub fn pt2segment_param(pt: &Vec2, line: &Line) -> f32 {
-    let t = pt2line_param(pt, line);
-    t.clamp(0.0, 1.0)
+pub fn pt2segment_param(pt: &Vec2, seg: &Segment) -> f32 {
+    let t = pt2line_param(pt, &seg.start, &seg.dir);
+    t.clamp(0.0, seg.len)
 }
 
-pub fn pt2segment(pt: &Vec2, line: &Line) -> Vec2 {
-    let t = pt2segment_param(pt, line);
-    *line.start() + *line.dir() * t
+pub fn pt2segment(pt: &Vec2, seg: &Segment) -> Vec2 {
+    let t = pt2segment_param(pt, seg);
+    seg.start + seg.dir * t
 }
 
 pub fn pt2rect(pt: &Vec2, rect: &Rect) -> Vec2 {

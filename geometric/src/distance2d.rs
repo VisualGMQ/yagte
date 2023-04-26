@@ -7,17 +7,17 @@ pub fn pt2pt_sqrd(pt1: &Vec2, pt2: &Vec2) -> f32 {
 }
 
 pub fn pt2line_sqrd(pt: &Vec2, line: &Line) -> f32 {
-    let p = pt2line(pt, line);
+    let p = pt2line(pt, &line.start, &line.dir);
     pt2pt_sqrd(&p, pt)
 }
 
-pub fn pt2seg_sqrd(pt: &Vec2, seg: &Line) -> f32 {
+pub fn pt2seg_sqrd(pt: &Vec2, seg: &Segment) -> f32 {
     let p = pt2segment(pt, seg);
     pt2pt_sqrd(&p, pt)
 }
 
-pub fn pt2ray_sqrd(pt: &Vec2, line: &Line) -> f32 {
-    let p = pt2ray(pt, line);
+pub fn pt2ray_sqrd(pt: &Vec2, ray: &Ray) -> f32 {
+    let p = pt2ray(pt, ray);
     pt2pt_sqrd(&p, pt)
 }
 
@@ -36,8 +36,8 @@ pub fn pt2polyline_sqrd(pt: &Vec2, polyline: &[Vec2]) -> Option<f32> {
     for pts in iter {
         match min_dist {
             None => {
-                let line = Line::new(pts[0], pts[1] - pts[0]);
-                min_dist = Some((*pt - pt2segment(pt, &line)).length_sqrd());
+                let seg = Segment::new(pts[0], pts[1] - pts[0]);
+                min_dist = Some((*pt - pt2segment(pt, &seg)).length_sqrd());
             }
             Some(dist_sqrt) => {
                 let dx1 = pts[0].x() - pt.x();
@@ -47,8 +47,8 @@ pub fn pt2polyline_sqrd(pt: &Vec2, polyline: &[Vec2]) -> Option<f32> {
                 if dx1 * dx1 <= dist_sqrt && dx2 * dx2 <= dist_sqrt
                     || dy1 * dy1 <= dist_sqrt && dy2 * dy2 <= dist_sqrt
                 {
-                    let line = Line::new(pts[0], pts[1] - pts[0]);
-                    min_dist = Some((*pt - pt2segment(pt, &line)).length_sqrd());
+                    let seg = Segment::new(pts[0], pts[1] - pts[0]);
+                    min_dist = Some((*pt - pt2segment(pt, &seg)).length_sqrd());
                 }
             }
         }
@@ -66,24 +66,24 @@ pub fn pt2triangle_sqrd(_pt: &Vec2, _triangle: Triangle) -> f32 {
 }
 
 pub fn line2line_sqrd(l1: &Line, l2: &Line) -> Option<f32> {
-    if l1.dir().cross(l2.dir()) != 0.0 {
+    if l1.dir.cross(&l2.dir) != 0.0 {
         return None;
     }
 
-    Some((*l1.start() - *l2.start()).dot(l1.normal()).abs())
+    Some((l1.start - l2.start).dot(&l1.normal()).abs())
 }
 
 pub fn ray2line_sqrd(l: &Line, ray: &Line) -> Option<f32> {
     match line2line_sqrd(l, ray) {
         Some(dist) => Some(dist),
         None => {
-            let normal = if (*ray.start() - *l.start()).dot(l.normal()) >= 0.0 {
-                *l.normal()
+            let normal = if (ray.start - l.start).dot(&l.normal()) >= 0.0 {
+                l.normal()
             } else {
-                -*l.normal()
+                -l.normal()
             };
-            if ray.dir().dot(&normal) >= 0.0 {
-                Some(pt2line_sqrd(ray.start(), l))
+            if ray.dir.dot(&normal) >= 0.0 {
+                Some(pt2line_sqrd(&ray.start, l))
             } else {
                 None
             }
