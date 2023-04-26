@@ -48,9 +48,8 @@ Yet Another Geometric Tool
 
 2D几何体之间的相交判断：
 
-||Point|Line|Segment|Ray|Triangle|Rect|Polyline|Polygon|
-|:-|:--:|:--:|:-----:|:--:|:------:|:--:|:------:|:-----:|
-|Point|:no_entry_sign:||||||
+|Line|Segment|Ray|Triangle|Rect|Polyline|Polygon|Circle|
+|:--:|:-----:|:-:|:------:|:--:|:------:|:-----:|:----:|
 |Line|||||||
 |Segment|||||||
 |Ray|||||||
@@ -58,6 +57,7 @@ Yet Another Geometric Tool
 |Rect|||||||
 |Polyline|||||||
 |Polygon|||||||
+|Circle|||||||:heavy_check_mark:|
 
 点在几何体内/上的判断：
 
