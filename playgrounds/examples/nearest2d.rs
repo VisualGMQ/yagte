@@ -1,4 +1,4 @@
-use ::math::matrix::{Vec2};
+use ::math::matrix::Vec2;
 use geometric::{geom2d::*, nearest2d};
 use playgrounds::draw_utility::*;
 use raylib::prelude::*;
@@ -31,8 +31,10 @@ fn main() {
         let rect = Rect::from_min_size(Vec2::from_xy(600.0, 200.0), Vec2::from_xy(100.0, 50.0));
 
         // draw mouse point
-        let mouse_pt: ::math::matrix::Matrix<f32, 1, 2> = Vec2::from_xy(d.get_mouse_x() as f32, d.get_mouse_y() as f32);
-        draw_circle(&mut d,
+        let mouse_pt: ::math::matrix::Matrix<f32, 1, 2> =
+            Vec2::from_xy(d.get_mouse_x() as f32, d.get_mouse_y() as f32);
+        draw_circle(
+            &mut d,
             &Circle {
                 center: mouse_pt,
                 radius: 3.0,
@@ -55,7 +57,8 @@ fn main() {
 
         // draw results
         for result in results {
-            draw_circle(&mut d,
+            draw_circle(
+                &mut d,
                 &Circle {
                     center: result,
                     radius: 3.0,

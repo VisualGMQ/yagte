@@ -129,9 +129,7 @@ pub struct Circle {
 
 impl Circle {
     pub fn new(center: Vec2, radius: f32) -> Circle {
-        Self {
-            center, radius
-        }
+        Self { center, radius }
     }
 }
 

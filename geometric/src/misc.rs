@@ -1,9 +1,9 @@
-use math::matrix::Vec3;
 use crate::utilitiy::approx_equal;
+use math::matrix::Vec3;
 
 pub fn get_arbitrary_from_plane(normal: &Vec3, pt: &Vec3) -> Vec3 {
-    let x = pt.x() + 1.0;    
-    let y = pt.y() + 1.0;    
+    let x = pt.x() + 1.0;
+    let y = pt.y() + 1.0;
     let s = normal.dot(&pt);
     if !approx_equal(0.0, normal.z(), 4) {
         let z = (s - (normal.x() * x + normal.y() * y)) / normal.z();

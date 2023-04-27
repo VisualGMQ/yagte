@@ -1,6 +1,32 @@
+use crate::utilitiy::approx_equal;
+use math::{coord::Cartesian3D, matrix::*};
 use std::ops::{Index, IndexMut};
 
-use math::{coord::Cartesian3D, matrix::*};
+pub struct Plane {
+    pub normal: Vec3,
+    pub pt: Vec3,
+}
+
+impl Plane {
+    pub fn new(normal: Vec3, pt: Vec3) -> Self {
+        Self { normal, pt }
+    }
+
+    pub fn is_parallel(&self, plane: &Plane) -> bool {
+        approx_equal(self.normal.cross(&plane.normal).length_sqrd(), 0.0, 6)
+    }
+}
+
+pub struct Line {
+    pub start: Vec3,
+    pub dir: Vec3, // normalized
+}
+
+impl Line {
+    pub fn new(start: Vec3, dir: Vec3) -> Self {
+        Self { start, dir }
+    }
+}
 
 pub struct Triangle {
     pts: [Vec3; 3],

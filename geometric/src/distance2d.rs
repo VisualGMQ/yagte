@@ -1,5 +1,6 @@
 use crate::geom2d::*;
 use crate::nearest2d::*;
+use crate::utilitiy::approx_equal;
 use math::matrix::*;
 
 pub fn pt2pt_sqrd(pt1: &Vec2, pt2: &Vec2) -> f32 {
@@ -57,16 +58,27 @@ pub fn pt2polyline_sqrd(pt: &Vec2, polyline: &[Vec2]) -> Option<f32> {
     min_dist
 }
 
-pub fn pt2polygon_sqrd(_pt: &Vec2, _polygon: &[Vec2]) -> f32 {
-    todo!();
+pub fn pt2polygon_sqrd(pt: &Vec2, polygon: &[Vec2]) -> Option<f32> {
+    if polygon.len() <= 1 {
+        None
+    } else {
+        Some(
+            pt2polyline_sqrd(pt, polygon)
+                .unwrap_or(0.0)
+                .min(pt2seg_sqrd(
+                    pt,
+                    &Segment::new(polygon[0], *polygon.last().unwrap()),
+                )),
+        )
+    }
 }
 
-pub fn pt2triangle_sqrd(_pt: &Vec2, _triangle: Triangle) -> f32 {
-    todo!();
+pub fn pt2triangle_sqrd(pt: &Vec2, triangle: Triangle) -> Option<f32> {
+    todo!()
 }
 
 pub fn line2line_sqrd(l1: &Line, l2: &Line) -> Option<f32> {
-    if l1.dir.cross(&l2.dir) != 0.0 {
+    if approx_equal(l1.dir.cross(&l2.dir), 0.0, 6) {
         return None;
     }
 
@@ -91,8 +103,13 @@ pub fn ray2line_sqrd(l: &Line, ray: &Line) -> Option<f32> {
     }
 }
 
-pub fn line2seg_sqrd(_l: &Line, _seg: &Line) -> Option<f32> {
-    todo!();
+pub fn line2seg_sqrd(l: &Line, seg: &Line) -> Option<f32> {
+    let end = seg.start + seg.dir * seg.len;
+    if (seg.start - l.start).cross(&l.dir) * end.cross(&l.dir) < 0.0 {
+        None
+    } else {
+        Some(pt2line_sqrd(&seg.start, &l).min(pt2line_sqrd(&end, &l)))
+    }
 }
 
 pub fn seg2seg_sqrd(_s1: &Line, _s2: &Line) -> Option<f32> {

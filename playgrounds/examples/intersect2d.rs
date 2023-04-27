@@ -1,5 +1,9 @@
-use ::math::matrix::{Vec2};
-use geometric::{geom2d::*, nearest2d, intersect2d::{is_circles_intersect, circles_intersect}};
+use ::math::matrix::Vec2;
+use geometric::{
+    geom2d::*,
+    intersect2d::{circles_intersect, is_circles_intersect},
+    nearest2d,
+};
 use playgrounds::draw_utility::*;
 use raylib::prelude::*;
 
@@ -19,17 +23,34 @@ fn main() {
         d.clear_background(Color::DARKGRAY);
 
         let c1 = Circle::new(Vec2::from_xy(400.0, 400.0), 50.0);
-        let c2 = Circle::new(Vec2::from_xy(d.get_mouse_x() as f32, d.get_mouse_y() as f32), 70.0);
+        let c2 = Circle::new(
+            Vec2::from_xy(d.get_mouse_x() as f32, d.get_mouse_y() as f32),
+            70.0,
+        );
 
         draw_circle(&mut d, &c1, Color::GREEN);
         draw_circle(&mut d, &c2, Color::GREEN);
 
         if is_circles_intersect(&c1, &c2) {
             let (pt1, pt2) = circles_intersect(&c1, &c2);
-            draw_circle(&mut d, &Circle { center: pt1, radius: 3.0 }, Color::BLUE);
+            draw_circle(
+                &mut d,
+                &Circle {
+                    center: pt1,
+                    radius: 3.0,
+                },
+                Color::BLUE,
+            );
 
             if let Some(pt) = pt2 {
-                draw_circle(&mut d, &Circle { center: pt, radius: 3.0 }, Color::BLUE);
+                draw_circle(
+                    &mut d,
+                    &Circle {
+                        center: pt,
+                        radius: 3.0,
+                    },
+                    Color::BLUE,
+                );
             }
         }
     }
