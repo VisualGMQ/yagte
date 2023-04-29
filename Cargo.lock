@@ -172,6 +172,7 @@ name = "playgrounds"
 version = "0.1.0"
 dependencies = [
  "geometric",
+ "graphics",
  "math",
  "raylib",
 ]
