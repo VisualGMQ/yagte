@@ -30,7 +30,7 @@ pub fn pt2segment(pt: &Vec2, seg: &Segment) -> Vec2 {
     seg.start + seg.dir * t
 }
 
-pub fn pt2rect(pt: &Vec2, rect: &Rect) -> Vec2 {
+pub fn pt2rect(pt: &Vec2, rect: &AABB) -> Vec2 {
     if crate::contain2d::is_rect_contain_pt(pt, rect) {
         return *pt;
     }

@@ -1,4 +1,5 @@
-use math::matrix::*;
+use math::cg::EularRotationXY;
+use math::{cg::Transformation2D, matrix::*};
 use std::ops::{Deref, Index, IndexMut};
 
 #[derive(Clone, Copy, Debug)]
@@ -41,7 +42,7 @@ impl Line {
     pub fn new(start: Vec2, dir: Vec2) -> Self {
         Self(Linear {
             start,
-            dir,
+            dir: dir.normalize(),
             len: 1.0,
         })
     }
@@ -84,7 +85,7 @@ impl Ray {
     pub fn new(start: Vec2, dir: Vec2) -> Self {
         Self(Linear {
             start,
-            dir,
+            dir: dir.normalize(),
             len: 1.0,
         })
     }
@@ -134,36 +135,79 @@ impl Circle {
 }
 
 #[derive(Clone, Copy, Debug)]
-pub struct Rect {
-    pub min: Vec2,
-    pub size: Vec2,
+pub struct AABB {
+    pub center: Vec2,
+    pub half_size: Vec2,
 }
 
-impl Rect {
+impl AABB {
     pub fn from_min_size(min: Vec2, size: Vec2) -> Self {
-        Self { min, size }
+        Self {
+            center: min + size / 2.0,
+            half_size: size / 2.0,
+        }
     }
 
     pub fn from_min_max(min: Vec2, max: Vec2) -> Self {
         Self {
-            min,
-            size: max - min,
+            center: (max + min) / 2.0,
+            half_size: (max - min) / 2.0,
         }
     }
 
     pub fn from_center(center: Vec2, half_size: Vec2) -> Self {
+        Self { center, half_size }
+    }
+
+    pub fn min(&self) -> Vec2 {
+        self.center - self.half_size
+    }
+
+    pub fn max(&self) -> Vec2 {
+        self.center + self.half_size
+    }
+
+    pub fn size(&self) -> Vec2 {
+        self.half_size * 2.0
+    }
+}
+
+pub struct OBB {
+    pub center: Vec2,
+    pub half_size: Vec2,
+    rotation: f32,
+    x_axis: Vec2,
+    y_axis: Vec2,
+}
+
+impl OBB {
+    pub fn new(center: Vec2, half_size: Vec2) -> Self {
         Self {
-            min: center - half_size,
-            size: half_size * 2.0,
+            center,
+            half_size,
+            rotation: 0.0,
+            x_axis: Vec2::x_axis(),
+            y_axis: Vec2::y_axis(),
         }
     }
 
-    pub fn min(&self) -> &Vec2 {
-        &self.min
+    pub fn x_axis(&self) -> Vec2 {
+        self.x_axis
     }
 
-    pub fn size(&self) -> &Vec2 {
-        &self.size
+    pub fn y_axis(&self) -> Vec2 {
+        self.y_axis
+    }
+
+    pub fn rotation(&self) -> f32 {
+        self.rotation
+    }
+
+    pub fn set_rotation(&mut self, rotation: f32) {
+        self.rotation = rotation;
+        let rotation = EularRotationXY::new(rotation);
+        self.x_axis = rotation.get_mat() * Vec2::x_axis();
+        self.y_axis = rotation.get_mat() * Vec2::y_axis();
     }
 }
 

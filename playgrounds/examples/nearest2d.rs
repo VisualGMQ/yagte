@@ -28,7 +28,7 @@ fn main() {
             Vec2::from_xy(500.0, 300.0),
             Vec2::from_xy(700.0, 300.0).normalize(),
         );
-        let rect = Rect::from_min_size(Vec2::from_xy(600.0, 200.0), Vec2::from_xy(100.0, 50.0));
+        let rect = AABB::from_min_size(Vec2::from_xy(600.0, 200.0), Vec2::from_xy(100.0, 50.0));
 
         // draw mouse point
         let mouse_pt: ::math::matrix::Matrix<f32, 1, 2> =

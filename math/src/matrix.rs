@@ -281,6 +281,14 @@ impl<T: ArithmeticGroup<T>, const LEN: usize> MulAssign<Matrix<T, LEN, LEN>>
     }
 }
 
+impl<T: ArithmeticGroup<T>, const COL: usize, const ROW: usize> MulAssign<T>
+    for Matrix<T, COL, ROW>
+{
+    fn mul_assign(&mut self, rhs: T) {
+        *self = *self * rhs;
+    }
+}
+
 pub type Mat22 = Matrix<f32, 2, 2>;
 pub type Mat33 = Matrix<f32, 3, 3>;
 pub type Mat44 = Matrix<f32, 4, 4>;

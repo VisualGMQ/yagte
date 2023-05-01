@@ -1,5 +1,5 @@
 use ::math::matrix::*;
-use geometric::geom2d::{Circle, Line, Rect, Segment, Triangle};
+use geometric::geom2d::{Circle, Line, Segment, Triangle, AABB};
 use raylib::prelude::*;
 
 pub fn draw_line(d: &mut RaylibDrawHandle, line: &Line, color: Color) {
@@ -100,12 +100,14 @@ pub fn draw_triangle(d: &mut RaylibDrawHandle, tri: &Triangle, color: Color) {
     }
 }
 
-pub fn draw_rect(d: &mut RaylibDrawHandle, rect: &Rect, color: Color) {
+pub fn draw_rect(d: &mut RaylibDrawHandle, rect: &AABB, color: Color) {
+    let min = rect.min();
+    let size = rect.size();
     d.draw_rectangle(
-        rect.min.x() as i32,
-        rect.min.y() as i32,
-        rect.size.x() as i32,
-        rect.size.y() as i32,
+        min.x() as i32,
+        min.y() as i32,
+        size.x() as i32,
+        size.y() as i32,
         color,
     );
 }

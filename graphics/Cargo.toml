@@ -8,4 +8,3 @@ edition = "2021"
 [dependencies]
 math = {path = "../math"}
 geometric = {path = "../geometric"}
-raylib = "3.7.0"

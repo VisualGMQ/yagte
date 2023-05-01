@@ -1,2 +1,2 @@
 [workspace]
-members = [ "geometric", "math", "graphics", "tools/visual-debugger", "playgrounds"]
+members = [ "geometric", "math", "graphics", "physics", "tools/visual-debugger", "playgrounds"]
