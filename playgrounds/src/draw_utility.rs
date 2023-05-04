@@ -1,8 +1,8 @@
 use ::math::matrix::*;
-use geometric::geom2d::{Circle, Line, Segment, Triangle, AABB};
+use geometric::geom2d::{Circle, Line2D, Segment2D, Triangle2D, AABB};
 use raylib::prelude::*;
 
-pub fn draw_line(d: &mut RaylibDrawHandle, line: &Line, color: Color) {
+pub fn draw_line(d: &mut RaylibDrawHandle, line: &Line2D, color: Color) {
     if line.dir.x() == 0.0 {
         d.draw_line(
             line.start.x() as i32,
@@ -29,7 +29,7 @@ pub fn draw_line(d: &mut RaylibDrawHandle, line: &Line, color: Color) {
     }
 }
 
-pub fn draw_ray(d: &mut RaylibDrawHandle, line: &geometric::geom2d::Ray, color: Color) {
+pub fn draw_ray(d: &mut RaylibDrawHandle, line: &geometric::geom2d::Ray2D, color: Color) {
     if line.dir.x() == 0.0 {
         d.draw_line(
             line.start.x() as i32,
@@ -66,7 +66,7 @@ pub fn draw_ray(d: &mut RaylibDrawHandle, line: &geometric::geom2d::Ray, color: 
     }
 }
 
-pub fn draw_seg(d: &mut RaylibDrawHandle, line: &Segment, color: Color) {
+pub fn draw_seg(d: &mut RaylibDrawHandle, line: &Segment2D, color: Color) {
     let end = line.start + line.dir * line.len;
     d.draw_line(
         line.start.x() as i32,
@@ -86,7 +86,7 @@ pub fn draw_circle(d: &mut RaylibDrawHandle, circle: &Circle, color: Color) {
     );
 }
 
-pub fn draw_triangle(d: &mut RaylibDrawHandle, tri: &Triangle, color: Color) {
+pub fn draw_triangle(d: &mut RaylibDrawHandle, tri: &Triangle2D, color: Color) {
     for i in 0..tri.pts.len() {
         let pt1 = &tri.pts[i];
         let pt2 = &tri.pts[(i + 1) % tri.pts.len()];

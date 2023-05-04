@@ -9,17 +9,17 @@ use playgrounds::draw_utility::*;
 use raylib::prelude::*;
 
 enum Primitive {
-    Line(Line),
-    Seg(Segment),
-    Ray(geom2d::Ray),
+    Line2D(Line2D),
+    Seg(Segment2D),
+    Ray2D(geom2d::Ray2D),
     Circle(Circle),
     AABB(AABB),
 }
 
 fn intersect(p1: &Primitive, p2: &Primitive) -> Option<(Vec2, Option<Vec2>)> {
     match p1 {
-        Primitive::Line(l) => match p2 {
-            Primitive::Line(o) => {
+        Primitive::Line2D(l) => match p2 {
+            Primitive::Line2D(o) => {
                 if let Some(p) = line_intersect(&l, &o) {
                     Some((p, None))
                 } else {
@@ -33,7 +33,7 @@ fn intersect(p1: &Primitive, p2: &Primitive) -> Option<(Vec2, Option<Vec2>)> {
                     None
                 }
             }
-            Primitive::Ray(o) => {
+            Primitive::Ray2D(o) => {
                 if let Some(p) = line_ray_intersect(&o, &l) {
                     Some((p, None))
                 } else {
@@ -44,7 +44,7 @@ fn intersect(p1: &Primitive, p2: &Primitive) -> Option<(Vec2, Option<Vec2>)> {
             Primitive::AABB(o) => todo!(),
         },
         Primitive::Seg(s) => match p2 {
-            Primitive::Line(_) => intersect(p2, p1),
+            Primitive::Line2D(_) => intersect(p2, p1),
             Primitive::Seg(o) => {
                 if let Some(p) = seg_intersect(&s, &o) {
                     Some((p, None))
@@ -52,7 +52,7 @@ fn intersect(p1: &Primitive, p2: &Primitive) -> Option<(Vec2, Option<Vec2>)> {
                     None
                 }
             }
-            Primitive::Ray(r) => {
+            Primitive::Ray2D(r) => {
                 if let Some(p) = ray_seg_intersect(&s, &r) {
                     Some((p, None))
                 } else {
@@ -62,8 +62,8 @@ fn intersect(p1: &Primitive, p2: &Primitive) -> Option<(Vec2, Option<Vec2>)> {
             Primitive::Circle(c) => segs_circle_intersect(&s, &c),
             Primitive::AABB(_) => todo!(),
         },
-        Primitive::Ray(r) => match p2 {
-            Primitive::Ray(o) => {
+        Primitive::Ray2D(r) => match p2 {
+            Primitive::Ray2D(o) => {
                 if let Some(p) = rays_intersect(r, o) {
                     Some((p, None))
                 } else {
@@ -91,9 +91,9 @@ fn intersect(p1: &Primitive, p2: &Primitive) -> Option<(Vec2, Option<Vec2>)> {
 
 fn draw_primitive(d: &mut RaylibDrawHandle, p: &Primitive) {
     match p {
-        Primitive::Line(l) => draw_line(d, l, Color::GREEN),
+        Primitive::Line2D(l) => draw_line(d, l, Color::GREEN),
         Primitive::Seg(s) => draw_seg(d, s, Color::BROWN),
-        Primitive::Ray(r) => draw_ray(d, r, Color::PINK),
+        Primitive::Ray2D(r) => draw_ray(d, r, Color::PINK),
         Primitive::Circle(c) => draw_circle(d, c, Color::BLUE),
         Primitive::AABB(r) => draw_rect(d, r, Color::GOLD),
     }
@@ -136,27 +136,27 @@ fn main() {
         Primitive::Circle(Circle::new(Vec2::from_xy(400.0, 400.0), 50.0)),
         Primitive::Circle(Circle::new(Vec2::from_xy(300.0, 350.0), 70.0)),
         Primitive::Circle(Circle::new(Vec2::from_xy(200.0, 300.0), 60.0)),
-        Primitive::Line(Line::new(
+        Primitive::Line2D(Line2D::new(
             Vec2::from_xy(425.0, 425.0),
             Vec2::from_xy(1.0, 0.5),
         )),
-        Primitive::Ray(geom2d::Ray::new(
+        Primitive::Ray2D(geom2d::Ray2D::new(
             Vec2::from_xy(350.0, 100.0),
             Vec2::from_xy(-1.0, 1.0),
         )),
-        Primitive::Ray(geom2d::Ray::new(
+        Primitive::Ray2D(geom2d::Ray2D::new(
             Vec2::from_xy(200.0, 100.0),
             Vec2::from_xy(1.0, 1.0),
         )),
-        Primitive::Ray(geom2d::Ray::new(
+        Primitive::Ray2D(geom2d::Ray2D::new(
             Vec2::from_xy(600.0, 100.0),
             Vec2::from_xy(1.0, 0.0),
         )),
-        Primitive::Seg(geom2d::Segment::new(
+        Primitive::Seg(geom2d::Segment2D::new(
             Vec2::from_xy(450.0, 300.0),
             Vec2::from_xy(350.0, 600.0),
         )),
-        Primitive::Seg(geom2d::Segment::new(
+        Primitive::Seg(geom2d::Segment2D::new(
             Vec2::from_xy(330.0, 400.0),
             Vec2::from_xy(350.0, 610.0),
         )),

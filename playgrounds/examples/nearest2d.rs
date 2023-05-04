@@ -19,12 +19,12 @@ fn main() {
         d.clear_background(Color::DARKGRAY);
 
         // some primitives
-        let seg = Segment::new(Vec2::from_xy(100.0, 100.0), Vec2::from_xy(200.0, 400.0));
-        let line = Line::new(
+        let seg = Segment2D::new(Vec2::from_xy(100.0, 100.0), Vec2::from_xy(200.0, 400.0));
+        let line = Line2D::new(
             Vec2::from_xy(100.0, 300.0),
             Vec2::from_xy(400.0, 200.0).normalize(),
         );
-        let ray = geometric::geom2d::Ray::new(
+        let ray = geometric::geom2d::Ray2D::new(
             Vec2::from_xy(500.0, 300.0),
             Vec2::from_xy(700.0, 300.0).normalize(),
         );

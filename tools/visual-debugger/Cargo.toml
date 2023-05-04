@@ -9,6 +9,8 @@ edition = "2021"
 log = "0.4.17"
 env_logger = "0.10.0"
 raylib = "3.7.0"
+toml = "0.7.3"
+serde = { version = "1.0.160", features = ["derive"] }
 
 math = {path = "../../math"}
 geometric = {path = "../../geometric"}

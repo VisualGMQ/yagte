@@ -1,6 +1,11 @@
-use geometric::geom3d::*;
+use std::{net::*, io::{ErrorKind, Read}, fs::File};
+use ::math::matrix::{Vec3, Vec4};
+use visual_debugger::netdata;
+
+use geometric::{geom3d::{*, self}, geom2d};
 use graphics::mesh_generate::*;
 use raylib::prelude::*;
+use toml::toml;
 
 fn draw_mesh(
     mode: &mut RaylibMode3D<RaylibDrawHandle>,
@@ -40,81 +45,63 @@ fn main() {
     );
     rl.set_camera_mode(&camera, CameraMode::CAMERA_FIRST_PERSON);
     rl.set_target_fps(60);
+    rl.show_cursor();
 
-    let cone = Cone {
-        bottom: ::math::matrix::Vec3::zeros(),
-        bottom_radius: 1.0,
-        dir: ::math::matrix::Vec3::z_axis(),
-        height: 1.0,
-    };
+    let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
+    listener.set_nonblocking(true).unwrap();
 
-    let cone_display_data = cone_to_display_data(
-        &cone,
-        ::math::matrix::Vec4::from_xyzw(1.0, 0.0, 0.0, 1.0),
-        100,
-    );
+    let mut client: Option<TcpStream> = None;
 
-    let truncated_cone = TruncatedCone {
-        bottom: ::math::matrix::Vec3::zeros(),
-        bottom_radius: 1.0,
-        top_radius: 0.5,
-        dir: ::math::matrix::Vec3::from_xyz(0.0, 0.0, 1.0),
-        height: 1.0,
-    };
-
-    let truncated_cone_display_data = truncatedcone_to_display_data(
-        &truncated_cone,
-        ::math::matrix::Vec4::from_xyzw(0.0, 0.0, 1.0, 1.0),
-        100,
-    );
-
-    let cylinder = Cylinder {
-        bottom: ::math::matrix::Vec3::zeros(),
-        radius: 1.0,
-        dir: ::math::matrix::Vec3::from_xyz(0.0, 1.0, 1.0),
-        height: 1.0,
-    };
-
-    let cylinder_display_data = cylinder_to_display_data(
-        &cylinder,
-        ::math::matrix::Vec4::from_xyzw(0.0, 1.0, 0.0, 1.0),
-        100,
-    );
+    let mut file = File::open("./tools/visual-debugger/resources/cylinder.toml").unwrap();
+    let content = std::io::read_to_string(&mut file).unwrap();
+    let cylinder: netdata::Cylinder = toml::from_str(&content).unwrap();
 
     while !rl.window_should_close() {
-        rl.update_camera(&mut camera);
+        // net work
+        // accept client
+        if client.is_none() {
+            match listener.accept() {
+                Ok(cli) => {
+                    client = Some(cli.0);
+                    println!("connected!");
+                }
+                Err(e) => {
+                    if e.kind() != ErrorKind::WouldBlock {
+                        eprintln!("net error: {}", e.kind());
+                    }
+                }
+            }
+        } else {
+            let client = client.as_mut().unwrap();
+            // read data
+            let mut buf = [0u8; 1024];
+            match client.read(&mut buf) {
+                Ok(num) => {
+                    if num > 0 {
+                        for i in 0..num {
+                            print!("{}", buf[i]);
+                        }
+                        println!("");
+                    }
+                },
+                Err(e) => {
+                    if e.kind() != ErrorKind::WouldBlock {
+                        client.shutdown(Shutdown::Both).unwrap();
+                        println!("shutdown client, Error: {:?}", e);
+                    }
+                }
+            }
+        }
+
+        // render
         let mut d = rl.begin_drawing(&thread);
-        let mut mode = d.begin_mode3D(camera);
+        d.update_camera(&mut camera);
+        let mut m = d.begin_mode3D(camera);
+        m.clear_background(Color::DARKGRAY);
+        m.draw_grid(100, 1.0);
 
-        mode.clear_background(Color::DARKGRAY);
-        mode.draw_grid(100, 1.0);
-        mode.draw_line_3D(
-            Vector3::new(0.0, 0.0, 0.0),
-            Vector3::new(100.0, 0.1, 0.0),
-            Color::RED,
-        );
-        mode.draw_line_3D(
-            Vector3::new(0.0, 0.0, 0.0),
-            Vector3::new(0.0, 100.0, 0.0),
-            Color::GREEN,
-        );
-        mode.draw_line_3D(
-            Vector3::new(0.0, 0.0, 0.0),
-            Vector3::new(0.0, 0.1, 100.0),
-            Color::BLUE,
-        );
-
-        // draw_mesh(&mut mode, &display_data);
-        draw_mesh(&mut mode, ::math::matrix::Vec3::zeros(), &cone_display_data);
-        draw_mesh(
-            &mut mode,
-            ::math::matrix::Vec3::from_xyz(2.0, 0.0, 0.0),
-            &cylinder_display_data,
-        );
-        draw_mesh(
-            &mut mode,
-            ::math::matrix::Vec3::from_xyz(6.0, 0.0, 0.0),
-            &truncated_cone_display_data,
-        );
+        let cy: geom3d::Cylinder = cylinder.into();
+        let data = cylinder_to_display_data(&cy, Vec4::from_xyzw(0.0, 1.0, 0.0, 1.0), 100);
+        draw_mesh(&mut m, Vec3::zeros(), &data);
     }
 }
