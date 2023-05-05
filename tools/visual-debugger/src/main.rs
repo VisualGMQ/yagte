@@ -2,10 +2,9 @@ use std::{net::*, io::{ErrorKind, Read}, fs::File};
 use ::math::matrix::{Vec3, Vec4};
 use visual_debugger::netdata;
 
-use geometric::{geom3d::{*, self}, geom2d};
+use geometric::geom3d;
 use graphics::mesh_generate::*;
 use raylib::prelude::*;
-use toml::toml;
 
 fn draw_mesh(
     mode: &mut RaylibMode3D<RaylibDrawHandle>,

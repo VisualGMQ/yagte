@@ -1,6 +1,7 @@
 use crate::utilitiy::approx_equal;
 use math::{coord::Cartesian3D, matrix::*};
 use std::ops::{Index, IndexMut};
+pub use crate::geom_common::{Linear3D, Line3D, Segment3D, Ray3D, Triangle3D};
 
 pub struct Plane {
     pub normal: Vec3,
@@ -167,6 +168,32 @@ pub struct ConicArc {
     pub range: (f32, f32), // range in theta(radians)
 }
 
+impl ConicArc {
+    pub fn center(&self) -> Vec3 {
+        match self.conic {
+            Conic::Ellipse(e) => e.position,
+            Conic::Hyperbola(h) => h.position,
+            Conic::Parabola(p) => p.position,
+        }
+    }
+
+    pub fn normal(&self) -> Vec3 {
+        match self.conic {
+            Conic::Ellipse(e) => e.normal,
+            Conic::Hyperbola(h) => h.normal,
+            Conic::Parabola(p) => p.normal,
+        }
+    }
+
+    pub fn x_axis(&self) -> Vec3 {
+        match self.conic {
+            Conic::Ellipse(e) => e.x_axis,
+            Conic::Hyperbola(h) => h.x_axis,
+            Conic::Parabola(p) => p.x_axis,
+        }
+    }
+}
+
 pub fn conic_to_polar(conic: &Conic) -> ConicArcInPolar {
     let (p, e, position, x_axis, normal) = match conic {
         Conic::Parabola(p) => (p.p, 1.0, p.position, p.x_axis, p.normal),
@@ -190,6 +217,7 @@ pub struct ConicArcInPolar {
     pub origin: Vec3,
     pub axis: Vec3,
     pub normal: Vec3,
+    pub range: Option<(f32, f32)>,
 }
 
 impl ConicArcInPolar {
@@ -200,6 +228,7 @@ impl ConicArcInPolar {
             origin,
             axis,
             normal,
+            range: None,
         }
     }
 

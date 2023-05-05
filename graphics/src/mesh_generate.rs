@@ -10,12 +10,12 @@ pub struct FaceDisplayData {
     pub color: Vec4,
 }
 
-pub struct LineDisplayData {
+pub struct LineStripDisplayData {
     pub vertices: Vec<Vec3>,
     pub color: Vec4,
 }
 
-pub fn plane_to_display_data(polygon: &Polygon, color: Vec4) -> Result<FaceDisplayData, &str> {
+pub fn polygon_to_display_data(polygon: &Polygon, color: Vec4) -> Result<FaceDisplayData, &str> {
     if polygon.points.len() < 3 {
         return Err("invalid polygon");
     }
@@ -40,7 +40,18 @@ pub fn plane_to_display_data(polygon: &Polygon, color: Vec4) -> Result<FaceDispl
     })
 }
 
-pub fn conic_curve_to_display_data(conic: &ConicArc, color: Vec4) -> LineDisplayData {
+pub fn polyline_to_display_data(polyline: &Vec<Vec3>, color: Vec4) -> Result<LineStripDisplayData, &str> {
+    if polyline.len() < 2 {
+        return Err("invalid polygon");
+    }
+
+    Ok(LineStripDisplayData {
+        vertices: polyline.clone(),
+        color,
+    })
+}
+
+pub fn conic_curve_to_display_data(conic: &ConicArc, color: Vec4) -> LineStripDisplayData {
     match &conic.conic {
         Conic::Ellipse(e) => ellipse_curve_to_display_data(e, conic.range, color),
         Conic::Hyperbola(h) => hyperbola_curve_to_display_data(h, conic.range, color),
@@ -52,7 +63,7 @@ fn ellipse_curve_to_display_data(
     ellipse: &Ellipse,
     range: (f32, f32),
     color: Vec4,
-) -> LineDisplayData {
+) -> LineStripDisplayData {
     const DEG_STEP: f32 = 0.01;
     let range = if range.0 > range.1 {
         (range.1, range.0)
@@ -70,14 +81,14 @@ fn ellipse_curve_to_display_data(
     let v = Vec3::from_xyz(ellipse.a * range.1.cos(), ellipse.b * range.1.sin(), 0.0);
     vertices.push(ellipse.get_coord().transform(v));
 
-    LineDisplayData { vertices, color }
+    LineStripDisplayData { vertices, color }
 }
 
 fn hyperbola_curve_to_display_data(
     hyperbola: &Hyperbola,
     range: (f32, f32),
     color: Vec4,
-) -> LineDisplayData {
+) -> LineStripDisplayData {
     const DEG_STEP: f32 = 0.01;
     let range = if range.0 > range.1 {
         (range.1, range.0)
@@ -99,14 +110,14 @@ fn hyperbola_curve_to_display_data(
     );
     vertices.push(hyperbola.get_coord().transform(v));
 
-    LineDisplayData { vertices, color }
+    LineStripDisplayData { vertices, color }
 }
 
 fn parabola_curve_to_display_data(
     parabola: &Parabola,
     range: (f32, f32),
     color: Vec4,
-) -> LineDisplayData {
+) -> LineStripDisplayData {
     const DEG_STEP: f32 = 0.01;
     let range = if range.0 > range.1 {
         (range.1, range.0)
@@ -132,7 +143,7 @@ fn parabola_curve_to_display_data(
     );
     vertices.push(parabola.get_coord().transform(v));
 
-    LineDisplayData { vertices, color }
+    LineStripDisplayData { vertices, color }
 }
 
 pub fn cylinder_to_display_data(cylinder: &Cylinder, color: Vec4, slice: u32) -> FaceDisplayData {
@@ -252,7 +263,22 @@ pub fn circle_to_display_data(circle: &Circle, color: Vec4, slice: u32) -> FaceD
             .collect(),
     };
 
-    plane_to_display_data(&polygon, color).unwrap()
+    polygon_to_display_data(&polygon, color).unwrap()
+}
+
+pub fn circle_arc_to_display_data(arc: &CircleArc, color: Vec4, slice: u32) -> LineStripDisplayData {
+    let deg_step = (arc.range.1 - arc.range.0) / slice as f32;
+
+    let z_axis = arc.x_axis.cross(&arc.norm);
+    let cart = Cartesian3D::new(arc.x_axis, arc.norm, z_axis, arc.center);
+
+    let points: Vec<Vec3> = (0..slice).map(|i| {
+        let deg = arc.range.0 + i as f32 * deg_step;
+        let point = Vec3::from_xyz(deg.sin() * arc.radius, 0.0, deg.cos() * arc.radius);
+        cart.transform(point)
+    }).collect();
+
+    polyline_to_display_data(&points, color).unwrap()
 }
 
 pub fn origin_circle_to_display_data(radius: f32, color: Vec4, slice: u32) -> FaceDisplayData {
@@ -267,5 +293,33 @@ pub fn origin_circle_to_display_data(radius: f32, color: Vec4, slice: u32) -> Fa
             .collect(),
     };
 
-    plane_to_display_data(&polygon, color).unwrap()
+    polygon_to_display_data(&polygon, color).unwrap()
+}
+
+pub fn conic_arc_to_display_data(arc: &ConicArc, color: Vec4, slice: u32) -> LineStripDisplayData {
+    let deg_step = (arc.range.1 - arc.range.0) / slice as f32;
+
+    let x_axis = arc.x_axis();
+    let normal = arc.normal();
+    let z_axis = x_axis.cross(&normal);
+    let cart = Cartesian3D::new(x_axis, normal, z_axis, arc.center());
+
+    let points: Vec<Vec3> = (0..slice).map(|i| {
+        let deg = arc.range.0 + i as f32 * deg_step;
+        let point = match arc.conic {
+            Conic::Ellipse(e) => {
+                Vec3::from_xyz(e.a * deg.cos(), e.b * deg.sin(), 0.0)
+            },
+            Conic::Hyperbola(h) => {
+                Vec3::from_xyz(h.a / deg.cos(), h.b * deg.tan(), 0.0)
+            }
+            Conic::Parabola(p) => {
+                let t = deg;
+                Vec3::from_xyz(2.0 * p.p * t * t, 2.0 * p.p * t, 0.0)
+            }
+        };
+        cart.transform(point)
+    }).collect();
+
+    polyline_to_display_data(&points, color).unwrap()
 }

@@ -39,7 +39,7 @@ pub struct TruncatedCone {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
-pub struct Line {
+pub struct Segment {
     begin: [f32; 3],
     end: [f32; 3],
 }
@@ -85,4 +85,19 @@ impl Into<geom3d::TruncatedCone> for TruncatedCone {
             top_radius: self.top_radius,
         }
     }
+}
+
+impl Into<geom3d::Segment3D> for Segment {
+    fn into(self) -> geom3d::Segment3D {
+        let begin = Vec3::new(self.begin);
+        let end = Vec3::new(self.end);
+        geom3d::Segment3D::new(begin, end)
+    }
+}
+
+pub enum NetGeometry {
+    Seg(Segment),
+    Cone(Cone),
+    Cylinder(Cylinder),
+    TruncatedCone(TruncatedCone),
 }
