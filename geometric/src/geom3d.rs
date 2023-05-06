@@ -194,41 +194,24 @@ impl ConicArc {
     }
 }
 
-pub fn conic_to_polar(conic: &Conic) -> ConicArcInPolar {
-    let (p, e, position, x_axis, normal) = match conic {
-        Conic::Parabola(p) => (p.p, 1.0, p.position, p.x_axis, p.normal),
-        Conic::Ellipse(e) => {
-            let c = (e.a * e.a - e.b * e.b).sqrt();
-            let alig = e.a * e.a / c;
-            (alig - c, c / e.a, e.position, e.x_axis, e.normal)
-        }
-        Conic::Hyperbola(h) => {
-            let c = (h.a * h.a + h.b * h.b).sqrt();
-            let alig = h.a * h.a / c;
-            (c - alig, c / h.a, h.position, h.x_axis, h.normal)
-        }
-    };
-    ConicArcInPolar::new(p, e, position, x_axis, normal)
-}
-
 pub struct ConicArcInPolar {
     pub p: f32,
     pub e: f32,
     pub origin: Vec3,
     pub axis: Vec3,
     pub normal: Vec3,
-    pub range: Option<(f32, f32)>,
+    pub range: (f32, f32),
 }
 
 impl ConicArcInPolar {
-    pub fn new(p: f32, e: f32, origin: Vec3, axis: Vec3, normal: Vec3) -> Self {
+    pub fn new(p: f32, e: f32, origin: Vec3, axis: Vec3, normal: Vec3, range: (f32, f32)) -> Self {
         Self {
             p,
             e,
             origin,
             axis,
             normal,
-            range: None,
+            range,
         }
     }
 

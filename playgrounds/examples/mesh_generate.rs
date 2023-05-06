@@ -133,6 +133,9 @@ fn main() {
     };
     let ellipse_arc2 = conic_arc_to_display_data(&ellipse_arc2, Vec4::from_xyzw(0.0, 1.0, 1.0, 1.0), 100);
 
+    let ellipse_arc3 = ConicArcInPolar::new(2.0, 1.3, Vec3::zeros(), Vec3::x_axis(), Vec3::y_axis(), (45f32.to_radians(), -45f32.to_radians()));
+    let ellipse_arc3 = polar_conic_arc_to_display_data(&ellipse_arc3, Vec4::from_xyzw(0.5, 0.3, 1.0, 1.0), 100);
+
     while !rl.window_should_close() {
         rl.update_camera(&mut camera);
         let mut d = rl.begin_drawing(&thread);
@@ -169,7 +172,8 @@ fn main() {
         //     &truncated_cone_display_data,
         // );
         // draw_polyline(&mut mode, Vec3::zeros(), &circle_arc);
-        draw_polyline(&mut mode, Vec3::zeros(), &ellipse_arc);
-        draw_polyline(&mut mode, Vec3::zeros(), &ellipse_arc2);
+        // draw_polyline(&mut mode, Vec3::zeros(), &ellipse_arc);
+        // draw_polyline(&mut mode, Vec3::zeros(), &ellipse_arc2);
+        draw_polyline(&mut mode, Vec3::zeros(), &ellipse_arc3);
     }
 }

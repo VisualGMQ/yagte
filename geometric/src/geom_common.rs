@@ -1,5 +1,4 @@
-use math::cg::EularRotationXY;
-use math::{cg::Transformation2D, matrix::*};
+use math::matrix::*;
 use std::ops::{Deref, Index, IndexMut};
 
 #[derive(Clone, Copy, Debug)]

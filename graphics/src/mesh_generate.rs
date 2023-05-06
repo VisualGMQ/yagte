@@ -323,3 +323,23 @@ pub fn conic_arc_to_display_data(arc: &ConicArc, color: Vec4, slice: u32) -> Lin
 
     polyline_to_display_data(&points, color).unwrap()
 }
+
+pub fn polar_conic_arc_to_display_data(arc: &ConicArcInPolar, color: Vec4, slice: u32) -> LineStripDisplayData {
+    let deg_step = (2.0 * PI - arc.range.0 + arc.range.1) / slice as f32;
+
+    let x_axis = arc.axis;
+    let normal = arc.normal;
+    let z_axis = x_axis.cross(&normal);
+    let cart = Cartesian3D::new(x_axis, normal, z_axis, arc.origin);
+
+    let mut deg = arc.range.0;
+    let points: Vec<Vec3> = (0..slice).map(|_| {
+        deg += deg_step;
+        deg = if deg >= PI { deg - 2.0 * PI } else { deg };
+        let l = arc.e * arc.p / (1.0 - arc.e * deg.cos());
+        let point = Vec3::from_xyz(l * deg.cos(), l * deg.sin(), 0.0);
+        cart.transform(point)
+    }).collect();
+
+    polyline_to_display_data(&points, color).unwrap()
+}

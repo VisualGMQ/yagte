@@ -14,7 +14,7 @@ Yet Another Geometric Tool
 
 |Cylinder|TruncatedCone|Cone|Polygon|Ellipse|Parabola|Hyperbola|
 |:------:|:-----------:|:--:|:-----:|:-----:|:------:|:-------:|
-|:heavy_check_mark:|:heavy_check_mark:|:heavy_check_mark:|:heavy_check_mark:|:o:|:o:|:o:|
+|:heavy_check_mark:|:heavy_check_mark:|:heavy_check_mark:|:heavy_check_mark:|:heavy_check_mark:|:heavy_check_mark:|:heavy_check_mark:|
 
 ![mesh_generate](./snapshot/mesh_generate.png)
 
