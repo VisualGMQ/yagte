@@ -1,5 +1,5 @@
-use ::math::matrix::Vec2;
-use geometric::{geom2d::*, nearest2d};
+use ::math::{matrix::Vec2, precision::real};
+use geometric::{geom2d::*, nearest2d, nearest_common};
 use playgrounds::draw_utility::*;
 use raylib::prelude::*;
 
@@ -31,8 +31,8 @@ fn main() {
         let rect = AABB::from_min_size(Vec2::from_xy(600.0, 200.0), Vec2::from_xy(100.0, 50.0));
 
         // draw mouse point
-        let mouse_pt: ::math::matrix::Matrix<f32, 1, 2> =
-            Vec2::from_xy(d.get_mouse_x() as f32, d.get_mouse_y() as f32);
+        let mouse_pt: ::math::matrix::Matrix<real, 1, 2> =
+            Vec2::from_xy(d.get_mouse_x() as real, d.get_mouse_y() as real);
         draw_circle(
             &mut d,
             &Circle {
@@ -49,9 +49,9 @@ fn main() {
 
         // nearest results
         let results = [
-            nearest2d::pt2segment(&mouse_pt, &seg),
-            nearest2d::pt2line(&mouse_pt, &line.start, &line.dir),
-            nearest2d::pt2ray(&mouse_pt, &ray),
+            nearest_common::pt2segment(&mouse_pt, &seg),
+            nearest_common::pt2line(&mouse_pt, &line.start, &line.dir),
+            nearest_common::pt2ray(&mouse_pt, &ray),
             nearest2d::pt2rect(&mouse_pt, &rect),
         ];
 

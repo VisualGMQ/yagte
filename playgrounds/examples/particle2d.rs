@@ -23,7 +23,7 @@ fn main() {
         world.update(
             0.05,
             |id, p: &mut Particle, duration, d: &mut RaylibDrawHandle| {
-                const FORCE: f32 = 10.0;
+                const FORCE: f64 = 10.0;
                 if id == 1 {
                     if d.is_key_down(KeyboardKey::KEY_D) {
                         p.add_force(Vec3::from_xyz(FORCE, 0.0, 0.0));

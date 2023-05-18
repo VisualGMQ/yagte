@@ -1,16 +1,16 @@
 use std::ops::{Add, Deref, DerefMut, Div, Mul, Sub};
 
-use crate::matrix::*;
+use crate::{matrix::*, precision::real};
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub struct Color(Vec4);
 
 impl Color {
-    pub fn from_rgb(r: f32, g: f32, b: f32) -> Self {
+    pub fn from_rgb(r: real, g: real, b: real) -> Self {
         Self(Vec4::from_xyzw(r, g, b, 1.0))
     }
 
-    pub fn from_rgba(r: f32, g: f32, b: f32, a: f32) -> Self {
+    pub fn from_rgba(r: real, g: real, b: real, a: real) -> Self {
         Self(Vec4::from_xyzw(r, g, b, a))
     }
 
@@ -22,19 +22,19 @@ impl Color {
         Self::from_rgb(0.0, 0.0, 0.0)
     }
 
-    pub fn r(&self) -> f32 {
+    pub fn r(&self) -> real {
         (*self)[0]
     }
 
-    pub fn g(&self) -> f32 {
+    pub fn g(&self) -> real {
         (*self)[1]
     }
 
-    pub fn b(&self) -> f32 {
+    pub fn b(&self) -> real {
         (*self)[2]
     }
 
-    pub fn a(&self) -> f32 {
+    pub fn a(&self) -> real {
         (*self)[3]
     }
 
@@ -83,10 +83,10 @@ impl Div for Color {
     }
 }
 
-impl Div<f32> for Color {
+impl Div<real> for Color {
     type Output = Self;
 
-    fn div(self, rhs: f32) -> Self::Output {
+    fn div(self, rhs: real) -> Self::Output {
         let mut result = Color::black();
         for i in 0..4 {
             result[i] = self[i] / rhs;
@@ -95,10 +95,10 @@ impl Div<f32> for Color {
     }
 }
 
-impl Mul<f32> for Color {
+impl Mul<real> for Color {
     type Output = Self;
 
-    fn mul(self, rhs: f32) -> Self::Output {
+    fn mul(self, rhs: real) -> Self::Output {
         let mut result = Color::black();
         for i in 0..4 {
             result[i] = self[i] * rhs;
@@ -136,24 +136,24 @@ pub trait Transformation2D {
 }
 
 pub struct Scale {
-    x: f32,
-    y: f32,
-    z: f32,
+    x: real,
+    y: real,
+    z: real,
 }
 
 impl Scale {
-    pub fn new(x: f32, y: f32, z: f32) -> Self {
+    pub fn new(x: real, y: real, z: real) -> Self {
         Self { x, y, z }
     }
-    pub fn x(&self) -> f32 {
+    pub fn x(&self) -> real {
         self.x
     }
 
-    pub fn y(&self) -> f32 {
+    pub fn y(&self) -> real {
         self.y
     }
 
-    pub fn z(&self) -> f32 {
+    pub fn z(&self) -> real {
         self.z
     }
 
@@ -179,25 +179,25 @@ impl Transformation3D for Scale {
 }
 
 pub struct Translation {
-    x: f32,
-    y: f32,
-    z: f32,
+    x: real,
+    y: real,
+    z: real,
 }
 
 impl Translation {
-    pub fn new(x: f32, y: f32, z: f32) -> Self {
+    pub fn new(x: real, y: real, z: real) -> Self {
         Self { x, y, z }
     }
 
-    pub fn x(&self) -> f32 {
+    pub fn x(&self) -> real {
         self.x
     }
 
-    pub fn y(&self) -> f32 {
+    pub fn y(&self) -> real {
         self.y
     }
 
-    pub fn z(&self) -> f32 {
+    pub fn z(&self) -> real {
         self.z
     }
 
@@ -223,11 +223,11 @@ impl Transformation3D for Translation {
 }
 
 pub struct EularRotationXY {
-    rotation: f32,
+    rotation: real,
 }
 
 impl EularRotationXY {
-    pub fn new(rotation: f32) -> Self {
+    pub fn new(rotation: real) -> Self {
         Self { rotation }
     }
 }
@@ -245,13 +245,13 @@ impl Transformation2D for EularRotationXY {
 }
 
 pub struct EularRotationXYZ {
-    x: f32,
-    y: f32,
-    z: f32,
+    x: real,
+    y: real,
+    z: real,
 }
 
 impl EularRotationXYZ {
-    pub fn new(x: f32, y: f32, z: f32) -> Self {
+    pub fn new(x: real, y: real, z: real) -> Self {
         Self { x, y, z }
     }
 
@@ -265,7 +265,7 @@ impl EularRotationXYZ {
 }
 
 #[rustfmt::skip]
-fn create_z_rotation(radians: f32) -> Mat44 {
+fn create_z_rotation(radians: real) -> Mat44 {
     let s = radians.sin();
     let c = radians.cos();
     Mat44::from_row(&[
@@ -277,7 +277,7 @@ fn create_z_rotation(radians: f32) -> Mat44 {
 }
 
 #[rustfmt::skip]
-fn create_x_rotation(radians: f32) -> Mat44 {
+fn create_x_rotation(radians: real) -> Mat44 {
     let s = radians.sin();
     let c = radians.cos();
     Mat44::from_row(&[
@@ -289,7 +289,7 @@ fn create_x_rotation(radians: f32) -> Mat44 {
 }
 
 #[rustfmt::skip]
-fn create_y_rotation(radians: f32) -> Mat44 {
+fn create_y_rotation(radians: real) -> Mat44 {
     let s = radians.sin();
     let c = radians.cos();
     Mat44::from_row(&[
@@ -308,7 +308,7 @@ impl Transformation3D for EularRotationXYZ {
 }
 
 #[rustfmt::skip]
-pub fn create_persp_project(near: f32, far: f32, half_fovy: f32, aspect: f32) -> Mat44 {
+pub fn create_persp_project(near: real, far: real, half_fovy: real, aspect: real) -> Mat44 {
     let inv_half_w = 1.0 / (half_fovy.tan() * near);
     let inv_half_h = aspect * inv_half_w;
 
@@ -321,7 +321,7 @@ pub fn create_persp_project(near: f32, far: f32, half_fovy: f32, aspect: f32) ->
 }
 
 #[rustfmt::skip]
-pub fn create_ortho_project(left: f32, right: f32, bottom: f32, top: f32, far: f32, near: f32) -> Mat44 {
+pub fn create_ortho_project(left: real, right: real, bottom: real, top: real, far: real, near: real) -> Mat44 {
     let inv_rl = 1.0 / (right - left);
     let inv_tb = 1.0 / (top - bottom);
     let inv_nf = 1.0 / (near - far);
@@ -335,9 +335,9 @@ pub fn create_ortho_project(left: f32, right: f32, bottom: f32, top: f32, far: f
 }
 
 pub struct Berycentric {
-    alpha: f32,
-    beta: f32,
-    gamma: f32,
+    alpha: real,
+    beta: real,
+    gamma: real,
 }
 
 impl Berycentric {
@@ -356,15 +356,15 @@ impl Berycentric {
         }
     }
 
-    pub fn alpha(&self) -> f32 {
+    pub fn alpha(&self) -> real {
         self.alpha
     }
 
-    pub fn beta(&self) -> f32 {
+    pub fn beta(&self) -> real {
         self.beta
     }
 
-    pub fn gamma(&self) -> f32 {
+    pub fn gamma(&self) -> real {
         self.gamma
     }
 }

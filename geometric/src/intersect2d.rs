@@ -1,11 +1,11 @@
+use crate::intersect_common::*;
 use crate::utilitiy::approx_equal;
-use crate::{contain2d, distance2d, geom2d::*, geom_common::*};
+use crate::{contain2d, distance2d, geom2d::*};
 use math::matrix::*;
+use math::precision::real;
 
 pub fn is_circles_intersect(c1: &Circle, c2: &Circle) -> bool {
-    let len_sqrd = (c2.center - c1.center).length_sqrd();
-    len_sqrd >= (c1.radius - c2.radius) * (c1.radius - c2.radius)
-        && len_sqrd <= (c1.radius + c2.radius) * (c1.radius + c2.radius)
+    is_circular_intersect(c1, c2)
 }
 
 /// calculate intersect point of two circle. these circle must intersect
@@ -91,7 +91,7 @@ pub fn is_ray_aabb_intersect(r: &Ray2D, aabb: &AABB) -> bool {
     return false;
 }
 
-pub fn line_intersect_param(l1: &Line2D, l2: &Line2D) -> Option<f32> {
+pub fn line_intersect_param(l1: &Line2D, l2: &Line2D) -> Option<real> {
     if l1.is_parallel(&l2) {
         return None;
     }
@@ -109,7 +109,7 @@ pub fn line_intersect(l1: &Line2D, l2: &Line2D) -> Option<Vec2> {
     }
 }
 
-pub fn line_seg_intersect_param(s: &Segment2D, l: &Line2D) -> Option<f32> {
+pub fn line_seg_intersect_param(s: &Segment2D, l: &Line2D) -> Option<real> {
     let t = line_intersect_param(&Line2D::new(s.start, s.dir), l);
     match t {
         Some(t) => {
@@ -130,7 +130,7 @@ pub fn line_seg_intersect(s: &Segment2D, l: &Line2D) -> Option<Vec2> {
     }
 }
 
-pub fn line_ray_intersect_param(r: &Ray2D, l: &Line2D) -> Option<f32> {
+pub fn line_ray_intersect_param(r: &Ray2D, l: &Line2D) -> Option<real> {
     let t = line_intersect_param(&Line2D::new(r.start, r.dir), l);
     match t {
         Some(t) => {
@@ -151,7 +151,7 @@ pub fn line_ray_intersect(r: &Ray2D, l: &Line2D) -> Option<Vec2> {
     }
 }
 
-pub fn line_circle_intersect_param(l: &Line2D, c: &Circle) -> Option<(f32, Option<f32>)> {
+pub fn line_circle_intersect_param(l: &Line2D, c: &Circle) -> Option<(real, Option<real>)> {
     let m = l.start - c.center;
     let b = m.dot(&l.dir);
     let c = m.length_sqrd() - c.radius * c.radius;
@@ -219,7 +219,7 @@ pub fn seg_intersect(s1: &Segment2D, s2: &Segment2D) -> Option<Vec2> {
     }
 }
 
-pub fn ray_circle_intersect_param(r: &Ray2D, c: &Circle) -> Option<(f32, Option<f32>)> {
+pub fn ray_circle_intersect_param(r: &Ray2D, c: &Circle) -> Option<(real, Option<real>)> {
     let result = line_circle_intersect_param(&Line2D::new(r.start, r.dir), &c);
     match result {
         Some((a, b)) => {
@@ -259,7 +259,7 @@ pub fn is_ray_circle_intersect(r: &Ray2D, c: &Circle) -> bool {
     }
 }
 
-pub fn seg_circle_intersect_param(s: &Segment2D, c: &Circle) -> Option<(f32, Option<f32>)> {
+pub fn seg_circle_intersect_param(s: &Segment2D, c: &Circle) -> Option<(real, Option<real>)> {
     let result = line_circle_intersect_param(&Line2D::new(s.start, s.dir), &c);
     match result {
         Some((a, b)) => {

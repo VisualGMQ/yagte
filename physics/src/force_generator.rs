@@ -1,8 +1,8 @@
 use crate::particle::Particle;
-use math::matrix::*;
+use math::{matrix::*, precision::real};
 
 pub trait ForceGeneratable {
-    fn update_force(&self, p: &mut Particle, duration: f32);
+    fn update_force(&self, p: &mut Particle, duration: real);
 }
 
 pub struct GravityGenerator {
@@ -16,7 +16,7 @@ impl GravityGenerator {
 }
 
 impl ForceGeneratable for GravityGenerator {
-    fn update_force(&self, p: &mut Particle, duration: f32) {
+    fn update_force(&self, p: &mut Particle, duration: real) {
         if p.is_inf_mass() {
             return;
         }
@@ -27,12 +27,12 @@ impl ForceGeneratable for GravityGenerator {
 
 pub struct SpringForceGenerator<'a> {
     other: Option<&'a Particle>,
-    pub k: f32,
-    pub static_length: f32,
+    pub k: real,
+    pub static_length: real,
 }
 
 impl<'a> SpringForceGenerator<'a> {
-    pub fn new(other: &'a Particle, k: f32, static_length: f32) -> Self {
+    pub fn new(other: &'a Particle, k: real, static_length: real) -> Self {
         Self {
             other: Some(other),
             k,
@@ -42,7 +42,7 @@ impl<'a> SpringForceGenerator<'a> {
 }
 
 impl<'a> ForceGeneratable for SpringForceGenerator<'a> {
-    fn update_force(&self, p: &mut Particle, duration: f32) {
+    fn update_force(&self, p: &mut Particle, duration: real) {
         if let Some(other) = self.other {
             let dir = other.pos - p.pos;
             let magnitude = dir.length() - self.static_length;
@@ -53,12 +53,12 @@ impl<'a> ForceGeneratable for SpringForceGenerator<'a> {
 
 pub struct AnchoredSpringForceGenerator {
     anchor: Vec3,
-    pub k: f32,
-    pub static_length: f32,
+    pub k: real,
+    pub static_length: real,
 }
 
 impl AnchoredSpringForceGenerator {
-    pub fn new(anchor: Vec3, k: f32, static_length: f32) -> Self {
+    pub fn new(anchor: Vec3, k: real, static_length: real) -> Self {
         Self {
             anchor,
             k,
@@ -68,7 +68,7 @@ impl AnchoredSpringForceGenerator {
 }
 
 impl ForceGeneratable for AnchoredSpringForceGenerator {
-    fn update_force(&self, p: &mut Particle, duration: f32) {
+    fn update_force(&self, p: &mut Particle, duration: real) {
         let dir = self.anchor - p.pos;
         let magnitude = dir.length() - self.static_length;
         p.add_force(dir.normalize() * magnitude);

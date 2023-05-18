@@ -1,4 +1,4 @@
-use crate::arithmetic::*;
+use crate::{arithmetic::*, precision::real};
 use std::ops::{
     Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
 };
@@ -289,12 +289,12 @@ impl<T: ArithmeticGroup<T>, const COL: usize, const ROW: usize> MulAssign<T>
     }
 }
 
-pub type Mat22 = Matrix<f32, 2, 2>;
-pub type Mat33 = Matrix<f32, 3, 3>;
-pub type Mat44 = Matrix<f32, 4, 4>;
+pub type Mat22 = Matrix<real, 2, 2>;
+pub type Mat33 = Matrix<real, 3, 3>;
+pub type Mat44 = Matrix<real, 4, 4>;
 
-impl<const COL: usize, const ROW: usize> Matrix<f32, COL, ROW> {
-    pub fn as_ptr(&self) -> *const f32 {
+impl<const COL: usize, const ROW: usize> Matrix<real, COL, ROW> {
+    pub fn as_ptr(&self) -> *const real {
         self.data.as_ptr().cast()
     }
 }
@@ -346,22 +346,8 @@ impl<T: ArithmeticGroup<T>, const LEN: usize> ColVector<T, LEN> {
     }
 }
 
-impl<const LEN: usize> ColVector<f64, LEN> {
-    pub fn length(&self) -> f64 {
-        self.length_sqrd().sqrt()
-    }
-
-    pub fn normalize(&self) -> Self {
-        *self / self.length()
-    }
-
-    pub fn normalize_self(&mut self) {
-        *self /= self.length();
-    }
-}
-
-impl<const LEN: usize> ColVector<f32, LEN> {
-    pub fn length(&self) -> f32 {
+impl<const LEN: usize> ColVector<real, LEN> {
+    pub fn length(&self) -> real {
         self.length_sqrd().sqrt()
     }
 
@@ -543,6 +529,11 @@ impl<T: ArithmeticGroup<T>> From<Vector4<T>> for Vector3<T> {
     }
 }
 
-pub type Vec2 = Vector2<f32>;
-pub type Vec3 = Vector3<f32>;
-pub type Vec4 = Vector4<f32>;
+pub type Vec2 = Vector2<real>;
+pub type Vec3 = Vector3<real>;
+pub type Vec4 = Vector4<real>;
+
+pub fn Lerp<T>(a: T, b: T, c: real) -> T
+    where T: Clone + Copy + Sub<T, Output = T> + Add<T, Output = T> + Mul<real, Output = T> {
+    a + (b - a) * c
+}

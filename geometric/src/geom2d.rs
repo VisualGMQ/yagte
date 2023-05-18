@@ -1,18 +1,7 @@
 use math::cg::EularRotationXY;
+use math::precision::real;
 use math::{cg::Transformation2D, matrix::*};
-pub use crate::geom_common::{Linear2D, Line2D, Ray2D, Segment2D, Triangle2D};
-
-#[derive(Clone, Copy, Debug)]
-pub struct Circle {
-    pub center: Vec2,
-    pub radius: f32,
-}
-
-impl Circle {
-    pub fn new(center: Vec2, radius: f32) -> Circle {
-        Self { center, radius }
-    }
-}
+pub use crate::geom_common::{Linear2D, Line2D, Ray2D, Segment2D, Triangle2D, Circle};
 
 #[derive(Clone, Copy, Debug)]
 pub struct AABB {
@@ -55,7 +44,7 @@ impl AABB {
 pub struct OBB {
     pub center: Vec2,
     pub half_size: Vec2,
-    rotation: f32,
+    rotation: real,
     x_axis: Vec2,
     y_axis: Vec2,
 }
@@ -79,11 +68,11 @@ impl OBB {
         self.y_axis
     }
 
-    pub fn rotation(&self) -> f32 {
+    pub fn rotation(&self) -> real {
         self.rotation
     }
 
-    pub fn set_rotation(&mut self, rotation: f32) {
+    pub fn set_rotation(&mut self, rotation: real) {
         self.rotation = rotation;
         let rotation = EularRotationXY::new(rotation);
         self.x_axis = rotation.get_mat() * Vec2::x_axis();
@@ -93,31 +82,31 @@ impl OBB {
 
 #[derive(Clone, Copy, Debug)]
 pub struct Ellipse {
-    pub a: f32,
-    pub b: f32,
+    pub a: real,
+    pub b: real,
     pub position: Vec2,
 }
 
 #[derive(Clone, Copy, Debug)]
 pub struct Parabola {
-    pub p: f32,
+    pub p: real,
     pub position: Vec2,
 }
 
 #[derive(Clone, Copy, Debug)]
 pub struct Hyperbola {
-    pub a: f32,
-    pub b: f32,
+    pub a: real,
+    pub b: real,
     pub position: Vec2,
 }
 
 #[derive(Clone, Copy, Debug)]
 pub struct CircleArc {
-    pub radius: f32,
+    pub radius: real,
     pub center: Vec3,
     pub norm: Vec3,
     pub x_axis: Vec3,
-    pub range: (f32, f32),
+    pub range: (real, real),
 }
 
 // TODO: implement B-Splin, Bezier Curve

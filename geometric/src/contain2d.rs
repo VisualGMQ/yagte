@@ -1,8 +1,8 @@
-use crate::geom2d::*;
+use crate::{geom2d::*, contain_common::is_circular_contain_pt};
 use math::matrix::*;
 
-pub fn is_circle_contain_pt(circle: &Circle, pt: &Vec2) -> bool {
-    (*pt - circle.center).length_sqrd() <= circle.radius * circle.radius
+pub fn is_circle_contain_pt(c: &Circle, pt: &Vec2) -> bool {
+    is_circular_contain_pt(c, pt)
 }
 
 pub fn is_rect_contain_pt(pt: &Vec2, rect: &AABB) -> bool {

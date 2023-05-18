@@ -1,4 +1,4 @@
-use math::matrix::*;
+use math::{matrix::*, precision::real};
 
 pub struct Particle {
     pub pos: Vec3,
@@ -6,12 +6,12 @@ pub struct Particle {
     pub acc: Vec3,
     pub force: Vec3,
 
-    pub damping: f32,
-    inv_mass: f32,
+    pub damping: real,
+    inv_mass: real,
 }
 
 impl Particle {
-    pub fn new(pos: Vec3, mass: f32) -> Self {
+    pub fn new(pos: Vec3, mass: real) -> Self {
         assert_ne!(mass, 0.0);
 
         Self {
@@ -24,7 +24,7 @@ impl Particle {
         }
     }
 
-    pub fn step(&mut self, duration: f32) {
+    pub fn step(&mut self, duration: real) {
         assert!(duration > 0.0);
 
         self.acc = self.force * self.inv_mass;
@@ -35,7 +35,7 @@ impl Particle {
         self.force = Vec3::zeros();
     }
 
-    pub fn set_mass(&mut self, mass: f32) {
+    pub fn set_mass(&mut self, mass: real) {
         assert_ne!(mass, 0.0);
         self.inv_mass = 1.0 / mass;
     }
@@ -44,11 +44,11 @@ impl Particle {
         self.force += force;
     }
 
-    pub fn inv_mass(&self) -> f32 {
+    pub fn inv_mass(&self) -> real {
         self.inv_mass
     }
 
-    pub fn mass(&self) -> f32 {
+    pub fn mass(&self) -> real {
         1.0 / self.inv_mass
     }
 

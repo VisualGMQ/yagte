@@ -9,8 +9,8 @@ fn main() {
                 x,
                 y,
                 Vec3::from_xyz(
-                    x as f32 / ppm.width() as f32,
-                    y as f32 / ppm.height() as f32,
+                    x as f64 / ppm.width() as f64,
+                    y as f64 / ppm.height() as f64,
                     1.0,
                 ),
             );

@@ -1,34 +1,6 @@
 use crate::{geom_common::*, geom2d::*};
 use math::matrix::*;
 
-pub fn pt2line_param(pt: &Vec2, start: &Vec2, dir: &Vec2) -> f32 {
-    (*pt - *start).dot(&dir)
-}
-
-pub fn pt2line(pt: &Vec2, start: &Vec2, dir: &Vec2) -> Vec2 {
-    let t = pt2line_param(pt, start, dir);
-    *start + *dir * t
-}
-
-pub fn pt2ray_param(pt: &Vec2, ray: &Ray2D) -> f32 {
-    let t = pt2line_param(pt, &ray.start, &ray.dir);
-    t.max(0.0)
-}
-
-pub fn pt2ray(pt: &Vec2, ray: &Ray2D) -> Vec2 {
-    let t = pt2ray_param(pt, ray);
-    ray.start + ray.dir * t
-}
-
-pub fn pt2segment_param(pt: &Vec2, seg: &Segment2D) -> f32 {
-    let t = pt2line_param(pt, &seg.start, &seg.dir);
-    t.clamp(0.0, seg.len)
-}
-
-pub fn pt2segment(pt: &Vec2, seg: &Segment2D) -> Vec2 {
-    let t = pt2segment_param(pt, seg);
-    seg.start + seg.dir * t
-}
 
 pub fn pt2rect(pt: &Vec2, rect: &AABB) -> Vec2 {
     if crate::contain2d::is_rect_contain_pt(pt, rect) {

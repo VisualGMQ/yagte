@@ -1,7 +1,7 @@
 use crate::utilitiy::approx_equal;
-use math::{coord::Cartesian3D, matrix::*};
+use math::{coord::Cartesian3D, matrix::*, precision::real};
 use std::ops::{Index, IndexMut};
-pub use crate::geom_common::{Linear3D, Line3D, Segment3D, Ray3D, Triangle3D};
+pub use crate::geom_common::{Linear3D, Line3D, Segment3D, Ray3D, Triangle3D, Sphere};
 
 pub struct Plane {
     pub normal: Vec3,
@@ -61,14 +61,14 @@ impl IndexMut<usize> for Triangle {
 
 #[derive(Clone, Copy, Debug)]
 pub struct Frustum {
-    pub near: f32,
-    pub far: f32,
-    pub half_fovy: f32,
-    pub aspect: f32,
+    pub near: real,
+    pub far: real,
+    pub half_fovy: real,
+    pub aspect: real,
 }
 
 impl Frustum {
-    pub fn new(near: f32, far: f32, half_fovy: f32, aspect: f32) -> Self {
+    pub fn new(near: real, far: real, half_fovy: real, aspect: real) -> Self {
         Self {
             near,
             far,
@@ -105,8 +105,8 @@ pub struct Polygon {
 pub struct Ellipse {
     pub x_axis: Vec3, // must be normalized
     pub normal: Vec3,
-    pub a: f32,
-    pub b: f32,
+    pub a: real,
+    pub b: real,
     pub position: Vec3,
 }
 
@@ -124,7 +124,7 @@ impl Ellipse {
 pub struct Parabola {
     pub x_axis: Vec3, // must be normalized
     pub normal: Vec3,
-    pub p: f32,
+    pub p: real,
     pub position: Vec3,
 }
 
@@ -142,8 +142,8 @@ impl Parabola {
 pub struct Hyperbola {
     pub x_axis: Vec3, // must be normalized
     pub normal: Vec3,
-    pub a: f32,
-    pub b: f32,
+    pub a: real,
+    pub b: real,
     pub position: Vec3,
 }
 
@@ -165,7 +165,7 @@ pub enum Conic {
 
 pub struct ConicArc {
     pub conic: Conic,
-    pub range: (f32, f32), // range in theta(radians)
+    pub range: (real, real), // range in theta(radians)
 }
 
 impl ConicArc {
@@ -195,16 +195,16 @@ impl ConicArc {
 }
 
 pub struct ConicArcInPolar {
-    pub p: f32,
-    pub e: f32,
+    pub p: real,
+    pub e: real,
     pub origin: Vec3,
     pub axis: Vec3,
     pub normal: Vec3,
-    pub range: (f32, f32),
+    pub range: (real, real),
 }
 
 impl ConicArcInPolar {
-    pub fn new(p: f32, e: f32, origin: Vec3, axis: Vec3, normal: Vec3, range: (f32, f32)) -> Self {
+    pub fn new(p: real, e: real, origin: Vec3, axis: Vec3, normal: Vec3, range: (real, real)) -> Self {
         Self {
             p,
             e,
@@ -227,11 +227,11 @@ impl ConicArcInPolar {
         self.e > 1.0
     }
 
-    pub fn calc_l(&self, theta: f32) -> f32 {
+    pub fn calc_l(&self, theta: real) -> real {
         self.e * self.p / (1.0 - self.e * theta.cos())
     }
 
-    pub fn get_focal_len(&self) -> f32 {
+    pub fn get_focal_len(&self) -> real {
         if self.is_parabola() {
             -self.p / 2.0
         } else {
@@ -239,11 +239,11 @@ impl ConicArcInPolar {
         }
     }
 
-    pub fn get_major_axis_len(&self) -> f32 {
+    pub fn get_major_axis_len(&self) -> real {
         self.get_focal_len() / self.e
     }
 
-    pub fn get_minor_axis_len(&self) -> f32 {
+    pub fn get_minor_axis_len(&self) -> real {
         let a = self.get_major_axis_len();
         let c = self.get_focal_len();
         (a * a - c * c).sqrt()
@@ -267,23 +267,23 @@ impl ConicArcInPolar {
 pub struct Cylinder {
     pub bottom: Vec3,
     pub dir: Vec3, // normalized
-    pub height: f32,
-    pub radius: f32,
+    pub height: real,
+    pub radius: real,
 }
 
 pub struct Cone {
     pub bottom: Vec3,
-    pub bottom_radius: f32,
+    pub bottom_radius: real,
     pub dir: Vec3, // normalized
-    pub height: f32,
+    pub height: real,
 }
 
 pub struct TruncatedCone {
     pub bottom: Vec3,
-    pub bottom_radius: f32,
-    pub top_radius: f32,
+    pub bottom_radius: real,
+    pub top_radius: real,
     pub dir: Vec3, // normalized
-    pub height: f32,
+    pub height: real,
 }
 
 pub enum CylinderLike {
@@ -293,9 +293,9 @@ pub enum CylinderLike {
 }
 
 pub struct CircleArc {
-    pub radius: f32,
+    pub radius: real,
     pub center: Vec3,
     pub norm: Vec3,
     pub x_axis: Vec3,
-    pub range: (f32, f32),
+    pub range: (real, real),
 }
