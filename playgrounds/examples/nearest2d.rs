@@ -1,4 +1,4 @@
-use ::math::{matrix::Vec2, precision::real};
+use ::math::{matrix::Vec2, precision::Real};
 use geometric::{geom2d::*, nearest2d, nearest_common};
 use playgrounds::draw_utility::*;
 use raylib::prelude::*;
@@ -31,8 +31,8 @@ fn main() {
         let rect = AABB::from_min_size(Vec2::from_xy(600.0, 200.0), Vec2::from_xy(100.0, 50.0));
 
         // draw mouse point
-        let mouse_pt: ::math::matrix::Matrix<real, 1, 2> =
-            Vec2::from_xy(d.get_mouse_x() as real, d.get_mouse_y() as real);
+        let mouse_pt: ::math::matrix::Matrix<Real, 1, 2> =
+            Vec2::from_xy(d.get_mouse_x() as Real, d.get_mouse_y() as Real);
         draw_circle(
             &mut d,
             &Circle {

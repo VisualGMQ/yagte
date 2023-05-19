@@ -1,5 +1,5 @@
 use graphics::ppm::PPM;
-use math::matrix::*;
+use math::{matrix::*, precision::Real};
 
 fn main() {
     let mut ppm = PPM::new(400, 300);
@@ -9,8 +9,8 @@ fn main() {
                 x,
                 y,
                 Vec3::from_xyz(
-                    x as f64 / ppm.width() as f64,
-                    y as f64 / ppm.height() as f64,
+                    x as Real / ppm.width() as Real,
+                    y as Real / ppm.height() as Real,
                     1.0,
                 ),
             );

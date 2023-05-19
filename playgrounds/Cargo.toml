@@ -11,3 +11,4 @@ geometric = {path = "../geometric"}
 graphics = {path = "../graphics"}
 physics = {path = "../physics"}
 raylib = "3.7.0"
+rand = "0.8.5"

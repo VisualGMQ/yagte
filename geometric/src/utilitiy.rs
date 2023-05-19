@@ -1,4 +1,4 @@
-use math::precision::real;
+use math::precision::Real;
 
 /// [Cohen-Sutherland Algorithm](https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm)
 pub mod cohen_sutherland {
@@ -83,9 +83,6 @@ pub mod cohen_sutherland {
 }
 
 #[inline]
-pub fn approx_equal(a: real, b: real, decimal_places: u8) -> bool {
-    let factor = 10.0f64.powi(decimal_places as i32);
-    let a = (a * factor).trunc();
-    let b = (b * factor).trunc();
-    a == b
+pub fn approx_equal(a: Real, b: Real, tol: f32) -> bool {
+    (a - b) <= tol
 }

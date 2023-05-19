@@ -1,8 +1,8 @@
-use math::{matrix::*, precision::real};
+use math::{matrix::*, precision::Real};
 
 use crate::{force_generator::*, particle::Particle};
 
-pub type ParticleUpdate<T> = fn(u32, &mut Particle, real, &mut T);
+pub type ParticleUpdate<T> = fn(u32, &mut Particle, Real, &mut T);
 
 struct ParticleWithID(u32, Particle);
 
@@ -25,12 +25,12 @@ impl World {
         self.force_generators.push(g);
     }
 
-    pub fn create_particle<'a>(&'a mut self, id: u32, pos: Vec3, mass: real) {
+    pub fn create_particle<'a>(&'a mut self, id: u32, pos: Vec3, mass: Real) {
         self.particles
             .push(ParticleWithID(id, Particle::new(pos, mass)));
     }
 
-    pub fn update<T>(&mut self, duration: real, update: ParticleUpdate<T>, param: &mut T) {
+    pub fn update<T>(&mut self, duration: Real, update: ParticleUpdate<T>, param: &mut T) {
         for particle in &mut self.particles {
             update(particle.0, &mut particle.1, duration, param);
         }

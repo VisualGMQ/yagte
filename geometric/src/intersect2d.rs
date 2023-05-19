@@ -2,7 +2,7 @@ use crate::intersect_common::*;
 use crate::utilitiy::approx_equal;
 use crate::{contain2d, distance2d, geom2d::*};
 use math::matrix::*;
-use math::precision::real;
+use math::precision::Real;
 
 pub fn is_circles_intersect(c1: &Circle, c2: &Circle) -> bool {
     is_circular_intersect(c1, c2)
@@ -16,7 +16,7 @@ pub fn circles_intersect(c1: &Circle, c2: &Circle) -> (Vec2, Option<Vec2>) {
     if approx_equal(
         len_sqrd,
         (c1.radius + c2.radius) * (c1.radius + c2.radius),
-        6,
+        0.00001,
     ) {
         return (dir.normalize() * c1.radius + c1.center, None);
     }
@@ -24,7 +24,7 @@ pub fn circles_intersect(c1: &Circle, c2: &Circle) -> (Vec2, Option<Vec2>) {
     if approx_equal(
         len_sqrd,
         (c1.radius - c2.radius) * (c1.radius - c2.radius),
-        6,
+        0.00001,
     ) {
         if c1.radius < c2.radius {
             return (-dir.normalize() * c1.radius + c1.center, None);
@@ -36,7 +36,7 @@ pub fn circles_intersect(c1: &Circle, c2: &Circle) -> (Vec2, Option<Vec2>) {
     let cosin = (len_sqrd + c1.radius * c1.radius - c2.radius * c2.radius)
         / (2.0 * c1.radius * len_sqrd.sqrt());
     let sin = (1.0 - cosin * cosin).sqrt();
-    let norm = if approx_equal(dir.x(), 0.0, 6) {
+    let norm = if approx_equal(dir.x(), 0.0, 0.00001) {
         Vec2::from_xy(1.0, 0.0)
     } else {
         Vec2::from_xy(-dir.y() / dir.x(), 1.0).normalize()
@@ -91,7 +91,7 @@ pub fn is_ray_aabb_intersect(r: &Ray2D, aabb: &AABB) -> bool {
     return false;
 }
 
-pub fn line_intersect_param(l1: &Line2D, l2: &Line2D) -> Option<real> {
+pub fn line_intersect_param(l1: &Line2D, l2: &Line2D) -> Option<Real> {
     if l1.is_parallel(&l2) {
         return None;
     }
@@ -109,7 +109,7 @@ pub fn line_intersect(l1: &Line2D, l2: &Line2D) -> Option<Vec2> {
     }
 }
 
-pub fn line_seg_intersect_param(s: &Segment2D, l: &Line2D) -> Option<real> {
+pub fn line_seg_intersect_param(s: &Segment2D, l: &Line2D) -> Option<Real> {
     let t = line_intersect_param(&Line2D::new(s.start, s.dir), l);
     match t {
         Some(t) => {
@@ -130,7 +130,7 @@ pub fn line_seg_intersect(s: &Segment2D, l: &Line2D) -> Option<Vec2> {
     }
 }
 
-pub fn line_ray_intersect_param(r: &Ray2D, l: &Line2D) -> Option<real> {
+pub fn line_ray_intersect_param(r: &Ray2D, l: &Line2D) -> Option<Real> {
     let t = line_intersect_param(&Line2D::new(r.start, r.dir), l);
     match t {
         Some(t) => {
@@ -151,13 +151,13 @@ pub fn line_ray_intersect(r: &Ray2D, l: &Line2D) -> Option<Vec2> {
     }
 }
 
-pub fn line_circle_intersect_param(l: &Line2D, c: &Circle) -> Option<(real, Option<real>)> {
+pub fn line_circle_intersect_param(l: &Line2D, c: &Circle) -> Option<(Real, Option<Real>)> {
     let m = l.start - c.center;
     let b = m.dot(&l.dir);
     let c = m.length_sqrd() - c.radius * c.radius;
 
     let delta = b * b - c;
-    if approx_equal(delta, 0.0, 6) {
+    if approx_equal(delta, 0.0, 0.00001) {
         Some((-b, None))
     } else if delta < 0.0 {
         None
@@ -219,7 +219,7 @@ pub fn seg_intersect(s1: &Segment2D, s2: &Segment2D) -> Option<Vec2> {
     }
 }
 
-pub fn ray_circle_intersect_param(r: &Ray2D, c: &Circle) -> Option<(real, Option<real>)> {
+pub fn ray_circle_intersect_param(r: &Ray2D, c: &Circle) -> Option<(Real, Option<Real>)> {
     let result = line_circle_intersect_param(&Line2D::new(r.start, r.dir), &c);
     match result {
         Some((a, b)) => {
@@ -259,7 +259,7 @@ pub fn is_ray_circle_intersect(r: &Ray2D, c: &Circle) -> bool {
     }
 }
 
-pub fn seg_circle_intersect_param(s: &Segment2D, c: &Circle) -> Option<(real, Option<real>)> {
+pub fn seg_circle_intersect_param(s: &Segment2D, c: &Circle) -> Option<(Real, Option<Real>)> {
     let result = line_circle_intersect_param(&Line2D::new(s.start, s.dir), &c);
     match result {
         Some((a, b)) => {

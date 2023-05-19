@@ -1,5 +1,5 @@
 use math::cg::EularRotationXY;
-use math::precision::real;
+use math::precision::Real;
 use math::{cg::Transformation2D, matrix::*};
 pub use crate::geom_common::{Linear2D, Line2D, Ray2D, Segment2D, Triangle2D, Circle};
 
@@ -44,7 +44,7 @@ impl AABB {
 pub struct OBB {
     pub center: Vec2,
     pub half_size: Vec2,
-    rotation: real,
+    rotation: Real,
     x_axis: Vec2,
     y_axis: Vec2,
 }
@@ -68,11 +68,11 @@ impl OBB {
         self.y_axis
     }
 
-    pub fn rotation(&self) -> real {
+    pub fn rotation(&self) -> Real {
         self.rotation
     }
 
-    pub fn set_rotation(&mut self, rotation: real) {
+    pub fn set_rotation(&mut self, rotation: Real) {
         self.rotation = rotation;
         let rotation = EularRotationXY::new(rotation);
         self.x_axis = rotation.get_mat() * Vec2::x_axis();
@@ -82,31 +82,31 @@ impl OBB {
 
 #[derive(Clone, Copy, Debug)]
 pub struct Ellipse {
-    pub a: real,
-    pub b: real,
+    pub a: Real,
+    pub b: Real,
     pub position: Vec2,
 }
 
 #[derive(Clone, Copy, Debug)]
 pub struct Parabola {
-    pub p: real,
+    pub p: Real,
     pub position: Vec2,
 }
 
 #[derive(Clone, Copy, Debug)]
 pub struct Hyperbola {
-    pub a: real,
-    pub b: real,
+    pub a: Real,
+    pub b: Real,
     pub position: Vec2,
 }
 
 #[derive(Clone, Copy, Debug)]
 pub struct CircleArc {
-    pub radius: real,
+    pub radius: Real,
     pub center: Vec3,
     pub norm: Vec3,
     pub x_axis: Vec3,
-    pub range: (real, real),
+    pub range: (Real, Real),
 }
 
 // TODO: implement B-Splin, Bezier Curve
