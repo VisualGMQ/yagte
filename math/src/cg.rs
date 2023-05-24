@@ -127,11 +127,11 @@ impl From<Color> for Vec4 {
     }
 }
 
-pub trait Transformation3D {
+pub trait Transform3D {
     fn get_mat(&self) -> Mat44;
 }
 
-pub trait Transformation2D {
+pub trait Transform2D {
     fn get_mat(&self) -> Mat22;
 }
 
@@ -166,7 +166,7 @@ impl Scale {
     }
 }
 
-impl Transformation3D for Scale {
+impl Transform3D for Scale {
     #[rustfmt::skip]
     fn get_mat(&self) -> Mat44 {
         Mat44::from_row(&[
@@ -210,7 +210,7 @@ impl Translation {
     }
 }
 
-impl Transformation3D for Translation {
+impl Transform3D for Translation {
     #[rustfmt::skip]
     fn get_mat(&self) -> Mat44 {
         Mat44::from_row(&[
@@ -232,7 +232,7 @@ impl EularRotationXY {
     }
 }
 
-impl Transformation2D for EularRotationXY {
+impl Transform2D for EularRotationXY {
     #[rustfmt::skip]
     fn get_mat(&self) -> Mat22 {
         let c = self.rotation.cos();
@@ -300,7 +300,7 @@ fn create_y_rotation(radians: Real) -> Mat44 {
     ])
 }
 
-impl Transformation3D for EularRotationXYZ {
+impl Transform3D for EularRotationXYZ {
     #[rustfmt::skip]
     fn get_mat(&self) -> Mat44 {
         create_z_rotation(self.z) * create_y_rotation(self.y) * create_x_rotation(self.x)

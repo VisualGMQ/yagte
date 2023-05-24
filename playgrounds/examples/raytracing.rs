@@ -1,4 +1,4 @@
-use math::{matrix::*, precision::Real};
+use math::{matrix::*, precision::Real, cg::Transform3D};
 use graphics::ppm::PPM;
 use geometric::{geom3d::*, intersect3d::ray_sphere_intersect_param};
 use rand::Rng;
@@ -7,17 +7,73 @@ const CANVA_WIDTH: usize = 200;
 const CANVA_HEIGHT: usize = 100;
 
 struct Camera {
-    position: Vec3,
-    mat: Mat44,
+    pub position: Vec3,
+    pub target: Vec3,
+    pub near: Real,
+    pub width: Real,
+    pub height: Real,
+
+    front: Vec3,
+    right: Vec3,
+    up: Vec3,
+    low_left_corner: Vec3,
 }
 
 impl Camera {
-    pub fn new(position: Vec3) -> Self {
-        Self { position, mat: Mat44::identity() }
+    pub fn new(near: Real, width: Real, height: Real) -> Self {
+        Self {
+            position: Vec3::zeros(),
+            target: Vec3::from_xyz(0.0, 0.0, -1.0),
+            near, width, height,
+            front: Vec3::from_xyz(0.0, 0.0, -near),
+            up: Vec3::from_xyz(0.0, height, 0.0),
+            right: Vec3::from_xyz(width, 0.0, 0.0),
+            low_left_corner: Vec3::from_xyz(-width * 0.5, -height * 0.5, -near),
+        }
     }
 
     pub fn lookat(&mut self, target: Vec3) {
-        self.mat = math::cg::lookat(self.position, target, Vec3::y_axis());
+        self.target = target;
+        self.calc_lookat();
+    }
+
+    pub fn move_to(&mut self, pos: Vec3) {
+        self.position = pos;
+        self.calc_lookat();
+    }
+
+    pub fn front(&self) -> &Vec3 {
+        &self.front
+    }
+
+    pub fn right(&self) -> &Vec3 {
+        &self.right
+    }
+
+    pub fn up(&self) -> &Vec3 {
+        &self.up
+    }
+
+    pub fn lower_left_corner(&self) -> &Vec3 {
+        &self.low_left_corner
+    }
+
+    fn calc_lookat(&mut self) {
+        let up = Vec3::from_xyz(0.0, 1.0, 0.0);
+        let front = (self.target - self.position).normalize();
+        let right = front.cross(&up);
+        let up = right.cross(&front);
+
+        self.up = up * self.height;
+        self.right = right * self.width;
+        self.front = front * self.near;
+
+        self.low_left_corner = -self.right * 0.5 - self.up * 0.5 + self.front;
+    }
+
+    pub fn get_ray(&self, u: Real, v: Real) -> Ray3D {
+        let dir = self.low_left_corner + *self.right() * u + *self.up() * v;
+        Ray3D::new(self.position, dir)
     }
 }
 
@@ -104,23 +160,17 @@ fn random_in_unit_sphere() -> Vec3 {
     }
 }
 
-fn fill_background(ppm: &mut PPM, x: usize, y: usize, v: Real) {
-    let color = lerp(Vec3::from_xyz(0.5, 0.7, 1.0), Vec3::from_xyz(1.0, 1.0, 1.0), v);
-    ppm.set_pixel(x, y, color);
-}
-
-const MAX_RECURSE: u32 = 1000;
+const MAX_RECURSE: u32 = 50;
 
 fn ray_color(ray: &Ray3D, world: &World, count: u32) -> Vec3 {
+    let unit_direction = random_in_unit_sphere();
     if let Some(hit) = world.hit(ray) {
         if count == 0 {
-            return Vec3::ones();
-        } else {
-            let pt_in_sphere = random_in_unit_sphere();
-            let target = hit.pt + hit.normal + pt_in_sphere;
-            let ray = Ray3D::new(hit.pt, target - hit.pt);
-            return ray_color(&ray, world, count - 1).mul_each(hit.material.color);
+            return Vec3::zeros();
         }
+        let target = hit.pt + hit.normal + unit_direction;
+        let ray = Ray3D::new(hit.pt, target - hit.pt);
+        return ray_color(&ray, world, count - 1).mul_each(hit.material.color);
     } else {
         return Vec3::ones();
     }
@@ -129,23 +179,34 @@ fn ray_color(ray: &Ray3D, world: &World, count: u32) -> Vec3 {
 fn main() {
     let mut ppm = PPM::new(CANVA_WIDTH, CANVA_HEIGHT);
     let sphere = Sphere::new(Vec3::from_xyz(0.0, 0.0, -1.0), 0.5);
-    let horizontal = Vec3::from_xyz(4.0, 0.0, 0.0);
-    let vertical = Vec3::from_xyz(0.0, 2.0, 0.0);
-    let origin = Vec3::from_xyz(0.0, 0.0, 0.0);
-    let lower_left_corner = Vec3::from_xyz(-2.0, -1.0, -1.0);
+    let mut camera = Camera::new(1.0, 4.0, 2.0);
+    camera.move_to(Vec3::from_xyz(0.0, 1.0, 1.0));
 
     let mut world = World::new();
     world.add(Box::new(Shape::new(sphere, Material { color: Vec3::from_xyz(0.1, 0.4, 0.2) })));
+    world.add(Box::new(Shape::new(Sphere::new(Vec3::from_xyz(0.0, -100.5, -1.0), 100.0), Material { color: Vec3::from_xyz(0.5, 0.5, 0.5) })));
+
+    let mut rng = rand::thread_rng();
+
+    const SAMPLE_COUNT: u32 = 100;
 
     for y in (0..CANVA_HEIGHT).rev() {
         for x in 0..CANVA_WIDTH {
-            let u = x as Real / CANVA_WIDTH as Real;
-            let v = (CANVA_HEIGHT - y - 1) as Real / CANVA_HEIGHT as Real;
+            println!("processing : {}/{}", (CANVA_HEIGHT - y - 1) * CANVA_WIDTH + x, CANVA_WIDTH * CANVA_HEIGHT);
+            let mut color = Vec3::zeros();
+            for _ in 0..SAMPLE_COUNT {
+                let u = (x as Real + rng.gen_range(0.0..1.0)) / CANVA_WIDTH as Real;
+                let v = ((CANVA_HEIGHT - y - 1) as Real - rng.gen_range(0.0..1.0)) / CANVA_HEIGHT as Real;
 
-            let ray = Ray3D::new(origin, lower_left_corner + horizontal * u + vertical * v - origin);
-            let color = ray_color(&ray, &world, MAX_RECURSE);
+                color += ray_color(&camera.get_ray(u, v), &world, MAX_RECURSE);
+            }
+
+            color /= SAMPLE_COUNT as Real;
+            color[0] = color.x().sqrt();
+            color[1] = color.y().sqrt();
+            color[2] = color.z().sqrt();
+
             ppm.set_pixel(x, y, color);
-            // fill_background(&mut ppm, x, y, v);
         }
     }
     ppm.write_to_file("result.ppm").unwrap();

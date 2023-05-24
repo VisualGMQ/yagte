@@ -1,6 +1,6 @@
 use math::cg::EularRotationXY;
 use math::precision::Real;
-use math::{cg::Transformation2D, matrix::*};
+use math::{cg::Transform2D, matrix::*};
 pub use crate::geom_common::{Linear2D, Line2D, Ray2D, Segment2D, Triangle2D, Circle};
 
 #[derive(Clone, Copy, Debug)]
