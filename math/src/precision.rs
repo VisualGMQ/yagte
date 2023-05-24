@@ -1,1 +1,1 @@
-pub type real = f64;
+pub type Real = f64;

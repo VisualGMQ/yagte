@@ -1,7 +1,7 @@
 use std::f64::consts::PI;
 
 use geometric::{geom2d::Circle, geom3d::*};
-use math::{coord::Cartesian3D, matrix::*, precision::real};
+use math::{coord::Cartesian3D, matrix::*, precision::Real};
 
 pub struct FaceDisplayData {
     pub vertices: Vec<Vec3>,
@@ -61,10 +61,10 @@ pub fn conic_curve_to_display_data(conic: &ConicArc, color: Vec4) -> LineStripDi
 
 fn ellipse_curve_to_display_data(
     ellipse: &Ellipse,
-    range: (real, real),
+    range: (Real, Real),
     color: Vec4,
 ) -> LineStripDisplayData {
-    const DEG_STEP: real = 0.01;
+    const DEG_STEP: Real = 0.01;
     let range = if range.0 > range.1 {
         (range.1, range.0)
     } else {
@@ -86,10 +86,10 @@ fn ellipse_curve_to_display_data(
 
 fn hyperbola_curve_to_display_data(
     hyperbola: &Hyperbola,
-    range: (real, real),
+    range: (Real, Real),
     color: Vec4,
 ) -> LineStripDisplayData {
-    const DEG_STEP: real = 0.01;
+    const DEG_STEP: Real = 0.01;
     let range = if range.0 > range.1 {
         (range.1, range.0)
     } else {
@@ -115,10 +115,10 @@ fn hyperbola_curve_to_display_data(
 
 fn parabola_curve_to_display_data(
     parabola: &Parabola,
-    range: (real, real),
+    range: (Real, Real),
     color: Vec4,
 ) -> LineStripDisplayData {
-    const DEG_STEP: real = 0.01;
+    const DEG_STEP: Real = 0.01;
     let range = if range.0 > range.1 {
         (range.1, range.0)
     } else {
@@ -251,11 +251,11 @@ pub fn cylinderlike_to_display_data(
 }
 
 pub fn circle_to_display_data(circle: &Circle, color: Vec4, slice: u32) -> FaceDisplayData {
-    let deg_step = 2.0 * PI / slice as real;
+    let deg_step = 2.0 * PI / slice as Real;
     let polygon = Polygon {
         points: (0..slice)
             .map(|i| {
-                let i = i as real;
+                let i = i as Real;
                 let deg = i * deg_step;
                 Vec3::from(circle.center)
                     + Vec3::from_xyz(deg.cos() * circle.radius, deg.sin() * circle.radius, 0.0)
@@ -267,13 +267,13 @@ pub fn circle_to_display_data(circle: &Circle, color: Vec4, slice: u32) -> FaceD
 }
 
 pub fn circle_arc_to_display_data(arc: &CircleArc, color: Vec4, slice: u32) -> LineStripDisplayData {
-    let deg_step = (arc.range.1 - arc.range.0) / slice as real;
+    let deg_step = (arc.range.1 - arc.range.0) / slice as Real;
 
     let z_axis = arc.x_axis.cross(&arc.norm);
     let cart = Cartesian3D::new(arc.x_axis, arc.norm, z_axis, arc.center);
 
     let points: Vec<Vec3> = (0..slice).map(|i| {
-        let deg = arc.range.0 + i as real * deg_step;
+        let deg = arc.range.0 + i as Real * deg_step;
         let point = Vec3::from_xyz(deg.sin() * arc.radius, 0.0, deg.cos() * arc.radius);
         cart.transform(point)
     }).collect();
@@ -281,12 +281,12 @@ pub fn circle_arc_to_display_data(arc: &CircleArc, color: Vec4, slice: u32) -> L
     polyline_to_display_data(&points, color).unwrap()
 }
 
-pub fn origin_circle_to_display_data(radius: real, color: Vec4, slice: u32) -> FaceDisplayData {
-    let deg_step = 2.0 * PI / slice as real;
+pub fn origin_circle_to_display_data(radius: Real, color: Vec4, slice: u32) -> FaceDisplayData {
+    let deg_step = 2.0 * PI / slice as Real;
     let polygon = Polygon {
         points: (0..slice)
             .map(|i| {
-                let i = i as real;
+                let i = i as Real;
                 let deg = i * deg_step;
                 Vec3::from_xyz(deg.cos() * radius, deg.sin() * radius, 0.0)
             })
@@ -297,7 +297,7 @@ pub fn origin_circle_to_display_data(radius: real, color: Vec4, slice: u32) -> F
 }
 
 pub fn conic_arc_to_display_data(arc: &ConicArc, color: Vec4, slice: u32) -> LineStripDisplayData {
-    let deg_step = (arc.range.1 - arc.range.0) / slice as real;
+    let deg_step = (arc.range.1 - arc.range.0) / slice as Real;
 
     let x_axis = arc.x_axis();
     let normal = arc.normal();
@@ -305,7 +305,7 @@ pub fn conic_arc_to_display_data(arc: &ConicArc, color: Vec4, slice: u32) -> Lin
     let cart = Cartesian3D::new(x_axis, normal, z_axis, arc.center());
 
     let points: Vec<Vec3> = (0..slice).map(|i| {
-        let deg = arc.range.0 + i as real * deg_step;
+        let deg = arc.range.0 + i as Real * deg_step;
         let point = match arc.conic {
             Conic::Ellipse(e) => {
                 Vec3::from_xyz(e.a * deg.cos(), e.b * deg.sin(), 0.0)
@@ -325,7 +325,7 @@ pub fn conic_arc_to_display_data(arc: &ConicArc, color: Vec4, slice: u32) -> Lin
 }
 
 pub fn polar_conic_arc_to_display_data(arc: &ConicArcInPolar, color: Vec4, slice: u32) -> LineStripDisplayData {
-    let deg_step = (2.0 * PI - arc.range.0 + arc.range.1) / slice as real;
+    let deg_step = (2.0 * PI - arc.range.0 + arc.range.1) / slice as Real;
 
     let x_axis = arc.axis;
     let normal = arc.normal;

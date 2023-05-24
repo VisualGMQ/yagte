@@ -1,8 +1,8 @@
 use crate::particle::Particle;
-use math::{matrix::*, precision::real};
+use math::{matrix::*, precision::Real};
 
 pub trait ForceGeneratable {
-    fn update_force(&self, p: &mut Particle, duration: real);
+    fn update_force(&self, p: &mut Particle, duration: Real);
 }
 
 pub struct GravityGenerator {
@@ -16,7 +16,7 @@ impl GravityGenerator {
 }
 
 impl ForceGeneratable for GravityGenerator {
-    fn update_force(&self, p: &mut Particle, duration: real) {
+    fn update_force(&self, p: &mut Particle, duration: Real) {
         if p.is_inf_mass() {
             return;
         }
@@ -27,12 +27,12 @@ impl ForceGeneratable for GravityGenerator {
 
 pub struct SpringForceGenerator<'a> {
     other: Option<&'a Particle>,
-    pub k: real,
-    pub static_length: real,
+    pub k: Real,
+    pub static_length: Real,
 }
 
 impl<'a> SpringForceGenerator<'a> {
-    pub fn new(other: &'a Particle, k: real, static_length: real) -> Self {
+    pub fn new(other: &'a Particle, k: Real, static_length: Real) -> Self {
         Self {
             other: Some(other),
             k,
@@ -42,7 +42,7 @@ impl<'a> SpringForceGenerator<'a> {
 }
 
 impl<'a> ForceGeneratable for SpringForceGenerator<'a> {
-    fn update_force(&self, p: &mut Particle, duration: real) {
+    fn update_force(&self, p: &mut Particle, duration: Real) {
         if let Some(other) = self.other {
             let dir = other.pos - p.pos;
             let magnitude = dir.length() - self.static_length;
@@ -53,12 +53,12 @@ impl<'a> ForceGeneratable for SpringForceGenerator<'a> {
 
 pub struct AnchoredSpringForceGenerator {
     anchor: Vec3,
-    pub k: real,
-    pub static_length: real,
+    pub k: Real,
+    pub static_length: Real,
 }
 
 impl AnchoredSpringForceGenerator {
-    pub fn new(anchor: Vec3, k: real, static_length: real) -> Self {
+    pub fn new(anchor: Vec3, k: Real, static_length: Real) -> Self {
         Self {
             anchor,
             k,
@@ -68,7 +68,7 @@ impl AnchoredSpringForceGenerator {
 }
 
 impl ForceGeneratable for AnchoredSpringForceGenerator {
-    fn update_force(&self, p: &mut Particle, duration: real) {
+    fn update_force(&self, p: &mut Particle, duration: Real) {
         let dir = self.anchor - p.pos;
         let magnitude = dir.length() - self.static_length;
         p.add_force(dir.normalize() * magnitude);

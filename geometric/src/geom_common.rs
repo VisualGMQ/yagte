@@ -1,12 +1,12 @@
 use math::matrix::*;
-use math::precision::real;
+use math::precision::Real;
 use std::ops::{Deref, Index, IndexMut};
 
 #[derive(Clone, Copy, Debug)]
 pub struct Linear<const DIM: usize> {
-    pub start: Vector<real, DIM>,
-    pub dir: Vector<real, DIM>,
-    pub len: real,
+    pub start: Vector<Real, DIM>,
+    pub dir: Vector<Real, DIM>,
+    pub len: Real,
 }
 
 pub type Linear2D = Linear<2>;
@@ -52,7 +52,7 @@ impl<const DIM: usize> Deref for Line<DIM> {
 }
 
 impl<const DIM: usize> Line<DIM> {
-    pub fn new(start: Vector<real, DIM>, dir: Vector<real, DIM>) -> Self {
+    pub fn new(start: Vector<Real, DIM>, dir: Vector<Real, DIM>) -> Self {
         Self(Linear::<DIM> {
             start,
             dir: dir.normalize(),
@@ -73,7 +73,7 @@ impl<const DIM: usize> Deref for Segment<DIM> {
 }
 
 impl<const DIM: usize> Segment<DIM> {
-    pub fn new(start: Vector<real, DIM>, end: Vector<real, DIM>) -> Self {
+    pub fn new(start: Vector<Real, DIM>, end: Vector<Real, DIM>) -> Self {
         let dir = end - start;
         Self(Linear::<DIM> {
             start,
@@ -95,7 +95,7 @@ impl<const DIM: usize> Deref for Ray<DIM> {
 }
 
 impl<const DIM: usize> Ray<DIM> {
-    pub fn new(start: Vector<real, DIM>, dir: Vector<real, DIM>) -> Self {
+    pub fn new(start: Vector<Real, DIM>, dir: Vector<Real, DIM>) -> Self {
         Self(Linear::<DIM> {
             start,
             dir: dir.normalize(),
@@ -106,11 +106,11 @@ impl<const DIM: usize> Ray<DIM> {
 
 #[derive(Clone, Copy, Debug)]
 pub struct Triangle<const DIM: usize> {
-    pub pts: [Vector<real, DIM>; 3],
+    pub pts: [Vector<Real, DIM>; 3],
 }
 
 impl<const DIM: usize> Triangle<DIM> {
-    pub fn new(pts: [Vector<real, DIM>; 3]) -> Self {
+    pub fn new(pts: [Vector<Real, DIM>; 3]) -> Self {
         Self { pts }
     }
 }
@@ -124,7 +124,7 @@ impl Triangle<2> {
 }
 
 impl<const DIM: usize> Index<usize> for Triangle<DIM> {
-    type Output = Vector<real, DIM>;
+    type Output = Vector<Real, DIM>;
 
     fn index(&self, index: usize) -> &Self::Output {
         &self.pts[index]
@@ -139,12 +139,12 @@ impl<const DIM: usize> IndexMut<usize> for Triangle<DIM> {
 
 #[derive(Clone, Copy, Debug)]
 pub struct Circular<const DIM: usize> {
-    pub radius: real,
-    pub center: Vector<real, DIM>,
+    pub radius: Real,
+    pub center: Vector<Real, DIM>,
 }
 
 impl<const DIM: usize> Circular<DIM> {
-    pub fn new(center: Vector<real, DIM>, radius: real) -> Self {
+    pub fn new(center: Vector<Real, DIM>, radius: Real) -> Self {
         Self { center, radius }
     }
 }

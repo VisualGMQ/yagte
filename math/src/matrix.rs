@@ -1,4 +1,4 @@
-use crate::{arithmetic::*, precision::real};
+use crate::{arithmetic::*, precision::Real};
 use std::ops::{
     Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
 };
@@ -289,12 +289,12 @@ impl<T: ArithmeticGroup<T>, const COL: usize, const ROW: usize> MulAssign<T>
     }
 }
 
-pub type Mat22 = Matrix<real, 2, 2>;
-pub type Mat33 = Matrix<real, 3, 3>;
-pub type Mat44 = Matrix<real, 4, 4>;
+pub type Mat22 = Matrix<Real, 2, 2>;
+pub type Mat33 = Matrix<Real, 3, 3>;
+pub type Mat44 = Matrix<Real, 4, 4>;
 
-impl<const COL: usize, const ROW: usize> Matrix<real, COL, ROW> {
-    pub fn as_ptr(&self) -> *const real {
+impl<const COL: usize, const ROW: usize> Matrix<Real, COL, ROW> {
+    pub fn as_ptr(&self) -> *const Real {
         self.data.as_ptr().cast()
     }
 }
@@ -346,8 +346,8 @@ impl<T: ArithmeticGroup<T>, const LEN: usize> ColVector<T, LEN> {
     }
 }
 
-impl<const LEN: usize> ColVector<real, LEN> {
-    pub fn length(&self) -> real {
+impl<const LEN: usize> ColVector<Real, LEN> {
+    pub fn length(&self) -> Real {
         self.length_sqrd().sqrt()
     }
 
@@ -529,11 +529,11 @@ impl<T: ArithmeticGroup<T>> From<Vector4<T>> for Vector3<T> {
     }
 }
 
-pub type Vec2 = Vector2<real>;
-pub type Vec3 = Vector3<real>;
-pub type Vec4 = Vector4<real>;
+pub type Vec2 = Vector2<Real>;
+pub type Vec3 = Vector3<Real>;
+pub type Vec4 = Vector4<Real>;
 
-pub fn Lerp<T>(a: T, b: T, c: real) -> T
-    where T: Clone + Copy + Sub<T, Output = T> + Add<T, Output = T> + Mul<real, Output = T> {
+pub fn Lerp<T>(a: T, b: T, c: Real) -> T
+    where T: Clone + Copy + Sub<T, Output = T> + Add<T, Output = T> + Mul<Real, Output = T> {
     a + (b - a) * c
 }

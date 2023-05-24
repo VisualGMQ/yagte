@@ -1,4 +1,4 @@
-use ::math::{matrix::*, precision::real};
+use ::math::{matrix::*, precision::Real};
 use geometric::geom2d::{Circle, Line2D, Segment2D, Triangle2D, AABB};
 use raylib::prelude::*;
 
@@ -14,9 +14,9 @@ pub fn draw_line(d: &mut RaylibDrawHandle, line: &Line2D, color: Color) {
     } else {
         let t = -line.start.x() / line.dir.x();
         let pt1 = Vec2::from_xy(0.0, line.start.y() + t * line.dir.y());
-        let t = (d.get_screen_width() as real - line.start.x()) / line.dir.x();
+        let t = (d.get_screen_width() as Real - line.start.x()) / line.dir.x();
         let pt2 = Vec2::from_xy(
-            d.get_screen_width() as real,
+            d.get_screen_width() as Real,
             line.start.y() + t * line.dir.y(),
         );
         d.draw_line(
@@ -50,9 +50,9 @@ pub fn draw_ray(d: &mut RaylibDrawHandle, line: &geometric::geom2d::Ray2D, color
                 color,
             );
         } else {
-            let t = (d.get_screen_width() as real - line.start.x()) / line.dir.x();
+            let t = (d.get_screen_width() as Real - line.start.x()) / line.dir.x();
             let end = Vec2::from_xy(
-                d.get_screen_width() as real,
+                d.get_screen_width() as Real,
                 line.start.y() + t * line.dir.y(),
             );
             d.draw_line(
