@@ -1,5 +1,6 @@
 mod arithmetic;
 pub mod cg;
+pub mod consts;
 pub mod coord;
 pub mod matrix;
 pub mod precision;

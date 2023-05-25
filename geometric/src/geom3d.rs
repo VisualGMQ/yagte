@@ -1,7 +1,7 @@
+pub use crate::geom_common::{Line3D, Linear3D, Ray3D, Segment3D, Sphere, Triangle3D};
 use crate::utilitiy::approx_equal;
 use math::{coord::Cartesian3D, matrix::*, precision::Real};
 use std::ops::{Index, IndexMut};
-pub use crate::geom_common::{Linear3D, Line3D, Segment3D, Ray3D, Triangle3D, Sphere};
 
 pub struct Plane {
     pub normal: Vec3,
@@ -204,7 +204,14 @@ pub struct ConicArcInPolar {
 }
 
 impl ConicArcInPolar {
-    pub fn new(p: Real, e: Real, origin: Vec3, axis: Vec3, normal: Vec3, range: (Real, Real)) -> Self {
+    pub fn new(
+        p: Real,
+        e: Real,
+        origin: Vec3,
+        axis: Vec3,
+        normal: Vec3,
+        range: (Real, Real),
+    ) -> Self {
         Self {
             p,
             e,

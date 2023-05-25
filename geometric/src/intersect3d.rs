@@ -26,10 +26,13 @@ pub fn line_sphere_intersect_param(r: &Line3D, c: &Sphere) -> Option<(Real, Opti
     if delta < 0.0 {
         None
     } else if approx_equal(delta, 0.0, 0.00001) {
-        Some((- b / (2.0 * a), None))
+        Some((-b / (2.0 * a), None))
     } else {
         let delta_sqrt = delta.sqrt();
-        Some(((-delta_sqrt - b) / (2.0 * a), Some((delta_sqrt - b) / (2.0 * a))))
+        Some((
+            (-delta_sqrt - b) / (2.0 * a),
+            Some((delta_sqrt - b) / (2.0 * a)),
+        ))
     }
 }
 

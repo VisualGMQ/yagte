@@ -164,7 +164,6 @@ pub fn line_circle_intersect_param(l: &Line2D, c: &Circle) -> Option<(Real, Opti
     } else {
         Some((-b - delta.sqrt(), Some(-b + delta.sqrt())))
     }
-
 }
 
 pub fn line_circle_intersect(l: &Line2D, c: &Circle) -> Option<(Vec2, Option<Vec2>)> {
@@ -180,7 +179,10 @@ pub fn line_circle_intersect(l: &Line2D, c: &Circle) -> Option<(Vec2, Option<Vec
 }
 
 pub fn ray_seg_intersect(seg: &Segment2D, r: &Ray2D) -> Option<Vec2> {
-    let param = line_intersect_param(&Line2D::new(seg.start, seg.dir), &Line2D::new(r.start, r.dir));
+    let param = line_intersect_param(
+        &Line2D::new(seg.start, seg.dir),
+        &Line2D::new(r.start, r.dir),
+    );
     match param {
         Some(p) => {
             if p >= 0.0 && p <= seg.len {
@@ -207,7 +209,10 @@ pub fn is_ray_seg_intersect(r: &Ray2D, seg: &Segment2D) -> bool {
 }
 
 pub fn seg_intersect(s1: &Segment2D, s2: &Segment2D) -> Option<Vec2> {
-    if let Some(p) = line_intersect(&Line2D::new(s1.start, s1.dir), &Line2D::new(s2.start, s2.dir)) {
+    if let Some(p) = line_intersect(
+        &Line2D::new(s1.start, s1.dir),
+        &Line2D::new(s2.start, s2.dir),
+    ) {
         let proj = (p - s2.start).dot(&s2.dir);
         if proj >= 0.0 && proj <= s2.len {
             Some(p)
@@ -295,9 +300,10 @@ pub fn segs_circle_intersect(s: &Segment2D, c: &Circle) -> Option<(Vec2, Option<
 }
 
 pub fn rays_intersect(r1: &Ray2D, r2: &Ray2D) -> Option<Vec2> {
-    if let Some(p) =
-        line_intersect_param(&Line2D::new(r1.start, r1.dir), &Line2D::new(r2.start, r2.dir))
-    {
+    if let Some(p) = line_intersect_param(
+        &Line2D::new(r1.start, r1.dir),
+        &Line2D::new(r2.start, r2.dir),
+    ) {
         if p < 0.0 {
             None
         } else {

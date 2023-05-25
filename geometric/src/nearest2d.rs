@@ -1,6 +1,5 @@
-use crate::{geom_common::*, geom2d::*};
+use crate::{geom2d::*, geom_common::*};
 use math::matrix::*;
-
 
 pub fn pt2rect(pt: &Vec2, rect: &AABB) -> Vec2 {
     if crate::contain2d::is_rect_contain_pt(pt, rect) {

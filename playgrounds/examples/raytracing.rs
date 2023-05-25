@@ -1,6 +1,6 @@
-use math::{matrix::*, precision::Real, cg::Transform3D};
-use graphics::ppm::PPM;
 use geometric::{geom3d::*, intersect3d::ray_sphere_intersect_param};
+use graphics::ppm::PPM;
+use math::{matrix::*, precision::Real};
 use rand::Rng;
 
 const CANVA_WIDTH: usize = 200;
@@ -24,7 +24,9 @@ impl Camera {
         Self {
             position: Vec3::zeros(),
             target: Vec3::from_xyz(0.0, 0.0, -1.0),
-            near, width, height,
+            near,
+            width,
+            height,
             front: Vec3::from_xyz(0.0, 0.0, -near),
             up: Vec3::from_xyz(0.0, height, 0.0),
             right: Vec3::from_xyz(width, 0.0, 0.0),
@@ -77,27 +79,28 @@ impl Camera {
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+type Scatter = Box<dyn Fn() -> Option<Ray3D>>;
+
+trait Scattering {
+    fn scatter(&self, ray_in: &Ray3D, hit: &HitResult) -> (Vec3, Ray3D);
+}
+
+#[derive(Copy, Clone)]
 struct HitResult<'a> {
     pub pt: Vec3,
     pub normal: Vec3,
     pub t: Real,
-    pub material: &'a Material,
-}
-
-#[derive(Copy, Clone, Debug)]
-struct Material {
-    color: Vec3,
+    pub material: &'a dyn Scattering,
 }
 
 struct Shape {
     sphere: Sphere,
-    material: Material,
+    scatter: Box<dyn Scattering>,
 }
 
 impl Shape {
-    pub fn new(sphere: Sphere, material: Material) -> Self {
-        Self { sphere, material }
+    pub fn new(sphere: Sphere, scatter: Box<dyn Scattering>) -> Self {
+        Self { sphere, scatter }
     }
 }
 
@@ -128,7 +131,7 @@ impl World {
                         if hit.t <= o.t {
                             *o = hit;
                         }
-                    },
+                    }
                     None => param = Some(hit),
                 }
             }
@@ -143,7 +146,12 @@ impl Hitable for Shape {
         let params = ray_sphere_intersect_param(&ray, &self.sphere);
         if let Some((t, _)) = params {
             let pt = ray.start + ray.dir * t;
-            Some(HitResult{ pt , normal: (pt - self.sphere.center) / self.sphere.radius, t, material: &self.material })
+            Some(HitResult {
+                pt,
+                normal: (pt - self.sphere.center) / self.sphere.radius,
+                t,
+                material: self.scatter.as_ref(),
+            })
         } else {
             None
         }
@@ -153,14 +161,15 @@ impl Hitable for Shape {
 fn random_in_unit_sphere() -> Vec3 {
     let mut rng = rand::thread_rng();
     loop {
-        let v = Vec3::from_xyz(rng.gen_range(-1.0..1.0), rng.gen_range(-1.0..1.0), rng.gen_range(-1.0..1.0));
-        if v.length_sqrd() <= 1.0 {
-            return v;
-        }
+        let a = rng.gen_range(0.0..2.0 * math::consts::PI);
+        let z = rng.gen_range(-1.0..1.0);
+        let r = (1.0f32 - z * z).sqrt();
+        return Vec3::from_xyz(r * a.cos(), r * a.sin(), z);
     }
 }
 
 const MAX_RECURSE: u32 = 50;
+const SAMPLE_COUNT: u32 = 100;
 
 fn ray_color(ray: &Ray3D, world: &World, count: u32) -> Vec3 {
     let unit_direction = random_in_unit_sphere();
@@ -168,35 +177,76 @@ fn ray_color(ray: &Ray3D, world: &World, count: u32) -> Vec3 {
         if count == 0 {
             return Vec3::zeros();
         }
+        let (ambient, ray) = hit.material.scatter(&ray, &hit);
+        ray_color(&ray, world, count - 1).mul_each(ambient)
+    } else {
+        Vec3::ones()
+    }
+}
+
+struct Lambertian {
+    color: Vec3,
+}
+
+impl Scattering for Lambertian {
+    fn scatter(&self, ray_in: &Ray3D, hit: &HitResult) -> (Vec3, Ray3D) {
+        let unit_direction = random_in_unit_sphere();
         let target = hit.pt + hit.normal + unit_direction;
         let ray = Ray3D::new(hit.pt, target - hit.pt);
-        return ray_color(&ray, world, count - 1).mul_each(hit.material.color);
-    } else {
-        return Vec3::ones();
+        (self.color, ray)
+    }
+}
+
+struct Metal {
+    color: Vec3,
+}
+
+impl Scattering for Metal {
+    fn scatter(&self, ray_in: &Ray3D, hit: &HitResult) -> (Vec3, Ray3D) {
+        let ray = Ray3D::new(hit.pt, math::cg::reflect(-ray_in.dir, hit.normal));
+        (self.color, ray)
     }
 }
 
 fn main() {
     let mut ppm = PPM::new(CANVA_WIDTH, CANVA_HEIGHT);
-    let sphere = Sphere::new(Vec3::from_xyz(0.0, 0.0, -1.0), 0.5);
     let mut camera = Camera::new(1.0, 4.0, 2.0);
     camera.move_to(Vec3::from_xyz(0.0, 1.0, 1.0));
 
     let mut world = World::new();
-    world.add(Box::new(Shape::new(sphere, Material { color: Vec3::from_xyz(0.1, 0.4, 0.2) })));
-    world.add(Box::new(Shape::new(Sphere::new(Vec3::from_xyz(0.0, -100.5, -1.0), 100.0), Material { color: Vec3::from_xyz(0.5, 0.5, 0.5) })));
+    world.add(Box::new(Shape::new(
+        Sphere::new(Vec3::from_xyz(0.0, 0.0, -1.0), 0.5),
+        Box::new(Lambertian {
+            color: Vec3::from_xyz(0.1, 0.4, 0.2),
+        }),
+    )));
+    world.add(Box::new(Shape::new(
+        Sphere::new(Vec3::from_xyz(0.0, -100.5, -1.0), 100.0),
+        Box::new(Lambertian {
+            color: Vec3::from_xyz(0.5, 0.5, 0.9),
+        }),
+    )));
+    world.add(Box::new(Shape::new(
+        Sphere::new(Vec3::from_xyz(-1.0, 0.0, -1.0), 0.5),
+        Box::new(Metal {
+            color: Vec3::from_xyz(0.8, 0.8, 0.8),
+        }),
+    )));
 
     let mut rng = rand::thread_rng();
 
-    const SAMPLE_COUNT: u32 = 100;
-
     for y in (0..CANVA_HEIGHT).rev() {
         for x in 0..CANVA_WIDTH {
-            println!("processing : {}/{}", (CANVA_HEIGHT - y - 1) * CANVA_WIDTH + x, CANVA_WIDTH * CANVA_HEIGHT);
+            println!(
+                "processing : {}/{}",
+                (CANVA_HEIGHT - y - 1) * CANVA_WIDTH + x,
+                CANVA_WIDTH * CANVA_HEIGHT
+            );
             let mut color = Vec3::zeros();
             for _ in 0..SAMPLE_COUNT {
                 let u = (x as Real + rng.gen_range(0.0..1.0)) / CANVA_WIDTH as Real;
-                let v = ((CANVA_HEIGHT - y - 1) as Real - rng.gen_range(0.0..1.0)) / CANVA_HEIGHT as Real;
+                let v = ((CANVA_HEIGHT - y - 1) as Real - rng.gen_range(0.0..1.0))
+                    / CANVA_HEIGHT as Real;
 
                 color += ray_color(&camera.get_ray(u, v), &world, MAX_RECURSE);
             }

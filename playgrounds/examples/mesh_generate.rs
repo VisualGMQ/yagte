@@ -1,6 +1,9 @@
+use ::math::{
+    matrix::{Vec3, Vec4},
+    precision::Real,
+};
 use geometric::geom3d::*;
 use graphics::mesh_generate::*;
-use ::math::{matrix::{Vec3, Vec4}, precision::Real};
 use raylib::prelude::*;
 
 fn draw_mesh(
@@ -42,7 +45,8 @@ fn draw_polyline(
                 (line_data.color.y() * 255.0).clamp(0.0, 255.0) as u8,
                 (line_data.color.z() * 255.0).clamp(0.0, 255.0) as u8,
                 (line_data.color.w() * 255.0).clamp(0.0, 255.0) as u8,
-            ));
+            ),
+        );
     }
 }
 
@@ -102,13 +106,17 @@ fn main() {
         100,
     );
 
-    let circle_arc = circle_arc_to_display_data(&CircleArc {
-        radius: 2.0,
-        center: Vec3::zeros(),
-        norm: Vec3::y_axis(),
-        x_axis: Vec3::x_axis(),
-        range: ((45.0 as Real).to_radians(), (-90.0 as Real).to_radians()),
-    }, ::math::matrix::Vec4::from_xyzw(0.0, 1.0, 1.0, 1.0) , 100);
+    let circle_arc = circle_arc_to_display_data(
+        &CircleArc {
+            radius: 2.0,
+            center: Vec3::zeros(),
+            norm: Vec3::y_axis(),
+            x_axis: Vec3::x_axis(),
+            range: ((45.0 as Real).to_radians(), (-90.0 as Real).to_radians()),
+        },
+        ::math::matrix::Vec4::from_xyzw(0.0, 1.0, 1.0, 1.0),
+        100,
+    );
 
     let ellipse_arc = ConicArc {
         conic: Conic::Parabola(Parabola {
@@ -119,7 +127,8 @@ fn main() {
         }),
         range: ((45.0 as Real).to_radians(), (-45.0 as Real).to_radians()),
     };
-    let ellipse_arc = conic_arc_to_display_data(&ellipse_arc, Vec4::from_xyzw(1.0, 1.0, 0.0, 1.0), 100);
+    let ellipse_arc =
+        conic_arc_to_display_data(&ellipse_arc, Vec4::from_xyzw(1.0, 1.0, 0.0, 1.0), 100);
 
     let ellipse_arc2 = ConicArc {
         conic: Conic::Ellipse(Ellipse {
@@ -131,10 +140,19 @@ fn main() {
         }),
         range: ((45.0 as Real).to_radians(), (-45.0 as Real).to_radians()),
     };
-    let ellipse_arc2 = conic_arc_to_display_data(&ellipse_arc2, Vec4::from_xyzw(0.0, 1.0, 1.0, 1.0), 100);
+    let ellipse_arc2 =
+        conic_arc_to_display_data(&ellipse_arc2, Vec4::from_xyzw(0.0, 1.0, 1.0, 1.0), 100);
 
-    let ellipse_arc3 = ConicArcInPolar::new(2.0, 1.3, Vec3::zeros(), Vec3::x_axis(), Vec3::y_axis(), ((45.0 as Real).to_radians(), (-45.0 as Real).to_radians()));
-    let ellipse_arc3 = polar_conic_arc_to_display_data(&ellipse_arc3, Vec4::from_xyzw(0.5, 0.3, 1.0, 1.0), 100);
+    let ellipse_arc3 = ConicArcInPolar::new(
+        2.0,
+        1.3,
+        Vec3::zeros(),
+        Vec3::x_axis(),
+        Vec3::y_axis(),
+        ((45.0 as Real).to_radians(), (-45.0 as Real).to_radians()),
+    );
+    let ellipse_arc3 =
+        polar_conic_arc_to_display_data(&ellipse_arc3, Vec4::from_xyzw(0.5, 0.3, 1.0, 1.0), 100);
 
     while !rl.window_should_close() {
         rl.update_camera(&mut camera);

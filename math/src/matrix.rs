@@ -534,6 +534,8 @@ pub type Vec3 = Vector3<Real>;
 pub type Vec4 = Vector4<Real>;
 
 pub fn lerp<T>(a: T, b: T, c: Real) -> T
-    where T: Clone + Copy + Sub<T, Output = T> + Add<T, Output = T> + Mul<Real, Output = T> {
+where
+    T: Clone + Copy + Sub<T, Output = T> + Add<T, Output = T> + Mul<Real, Output = T>,
+{
     a + (b - a) * c
 }

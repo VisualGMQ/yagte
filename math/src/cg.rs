@@ -1,6 +1,6 @@
 use std::ops::{Add, Deref, DerefMut, Div, Mul, Sub};
 
-use crate::{matrix::*, precision::Real, arithmetic::ArithmeticGroup};
+use crate::{arithmetic::ArithmeticGroup, matrix::*, precision::Real};
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub struct Color(Vec4);
@@ -381,6 +381,13 @@ pub fn lookat(position: Vec3, target: Vec3, up: Vec3) -> Mat44 {
         front.x(), front.y(), front.z(), -front.dot(&position),
         0.0, 0.0, 0.0, 1.0,
     ])
+}
+
+/// return a Vec3 reflect by normal frm v_in
+#[inline]
+pub fn reflect(v_in: Vec3, normal: Vec3) -> Vec3 {
+    let a = normal.dot(&v_in);
+    normal * 2.0 * a - v_in
 }
 
 // TODO: implement Rodriguez's formula

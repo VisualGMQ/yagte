@@ -1,11 +1,19 @@
 use crate::geom_common::*;
 use math::{matrix::*, precision::Real};
 
-pub fn pt2line_param<const DIM: usize>(pt: &Vector<Real, DIM>, start: &Vector<Real, DIM>, dir: &Vector<Real, DIM>) -> Real {
+pub fn pt2line_param<const DIM: usize>(
+    pt: &Vector<Real, DIM>,
+    start: &Vector<Real, DIM>,
+    dir: &Vector<Real, DIM>,
+) -> Real {
     (*pt - *start).dot(&dir)
 }
 
-pub fn pt2line<const DIM: usize>(pt: &Vector<Real, DIM>, start: &Vector<Real, DIM>, dir: &Vector<Real, DIM>) -> Vector<Real, DIM> {
+pub fn pt2line<const DIM: usize>(
+    pt: &Vector<Real, DIM>,
+    start: &Vector<Real, DIM>,
+    dir: &Vector<Real, DIM>,
+) -> Vector<Real, DIM> {
     let t = pt2line_param(pt, start, dir);
     *start + *dir * t
 }
@@ -25,7 +33,10 @@ pub fn pt2segment_param<const DIM: usize>(pt: &Vector<Real, DIM>, seg: &Segment<
     t.clamp(0.0, seg.len)
 }
 
-pub fn pt2segment<const DIM: usize>(pt: &Vector<Real, DIM>, seg: &Segment<DIM>) -> Vector<Real, DIM> {
+pub fn pt2segment<const DIM: usize>(
+    pt: &Vector<Real, DIM>,
+    seg: &Segment<DIM>,
+) -> Vector<Real, DIM> {
     let t = pt2segment_param(pt, seg);
     seg.start + seg.dir * t
 }

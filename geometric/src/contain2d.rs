@@ -1,4 +1,4 @@
-use crate::{geom2d::*, contain_common::is_circular_contain_pt};
+use crate::{contain_common::is_circular_contain_pt, geom2d::*};
 use math::matrix::*;
 
 pub fn is_circle_contain_pt(c: &Circle, pt: &Vec2) -> bool {

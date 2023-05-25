@@ -1,4 +1,4 @@
-use math::precision::PI;
+use math::consts::PI;
 
 use geometric::{geom2d::Circle, geom3d::*};
 use math::{coord::Cartesian3D, matrix::*, precision::Real};
@@ -40,7 +40,10 @@ pub fn polygon_to_display_data(polygon: &Polygon, color: Vec4) -> Result<FaceDis
     })
 }
 
-pub fn polyline_to_display_data(polyline: &Vec<Vec3>, color: Vec4) -> Result<LineStripDisplayData, &str> {
+pub fn polyline_to_display_data(
+    polyline: &Vec<Vec3>,
+    color: Vec4,
+) -> Result<LineStripDisplayData, &str> {
     if polyline.len() < 2 {
         return Err("invalid polygon");
     }
@@ -266,17 +269,23 @@ pub fn circle_to_display_data(circle: &Circle, color: Vec4, slice: u32) -> FaceD
     polygon_to_display_data(&polygon, color).unwrap()
 }
 
-pub fn circle_arc_to_display_data(arc: &CircleArc, color: Vec4, slice: u32) -> LineStripDisplayData {
+pub fn circle_arc_to_display_data(
+    arc: &CircleArc,
+    color: Vec4,
+    slice: u32,
+) -> LineStripDisplayData {
     let deg_step = (arc.range.1 - arc.range.0) / slice as Real;
 
     let z_axis = arc.x_axis.cross(&arc.norm);
     let cart = Cartesian3D::new(arc.x_axis, arc.norm, z_axis, arc.center);
 
-    let points: Vec<Vec3> = (0..slice).map(|i| {
-        let deg = arc.range.0 + i as Real * deg_step;
-        let point = Vec3::from_xyz(deg.sin() * arc.radius, 0.0, deg.cos() * arc.radius);
-        cart.transform(point)
-    }).collect();
+    let points: Vec<Vec3> = (0..slice)
+        .map(|i| {
+            let deg = arc.range.0 + i as Real * deg_step;
+            let point = Vec3::from_xyz(deg.sin() * arc.radius, 0.0, deg.cos() * arc.radius);
+            cart.transform(point)
+        })
+        .collect();
 
     polyline_to_display_data(&points, color).unwrap()
 }
@@ -303,27 +312,29 @@ pub fn conic_arc_to_display_data(arc: &ConicArc, color: Vec4, slice: u32) -> Lin
     let z_axis = x_axis.cross(&normal);
     let cart = Cartesian3D::new(x_axis, normal, z_axis, arc.center());
 
-    let points: Vec<Vec3> = (0..slice).map(|i| {
-        let deg = arc.range.0 + i as Real * deg_step;
-        let point = match arc.conic {
-            Conic::Ellipse(e) => {
-                Vec3::from_xyz(e.a * deg.cos(), e.b * deg.sin(), 0.0)
-            },
-            Conic::Hyperbola(h) => {
-                Vec3::from_xyz(h.a / deg.cos(), h.b * deg.tan(), 0.0)
-            }
-            Conic::Parabola(p) => {
-                let t = deg;
-                Vec3::from_xyz(2.0 * p.p * t * t, 2.0 * p.p * t, 0.0)
-            }
-        };
-        cart.transform(point)
-    }).collect();
+    let points: Vec<Vec3> = (0..slice)
+        .map(|i| {
+            let deg = arc.range.0 + i as Real * deg_step;
+            let point = match arc.conic {
+                Conic::Ellipse(e) => Vec3::from_xyz(e.a * deg.cos(), e.b * deg.sin(), 0.0),
+                Conic::Hyperbola(h) => Vec3::from_xyz(h.a / deg.cos(), h.b * deg.tan(), 0.0),
+                Conic::Parabola(p) => {
+                    let t = deg;
+                    Vec3::from_xyz(2.0 * p.p * t * t, 2.0 * p.p * t, 0.0)
+                }
+            };
+            cart.transform(point)
+        })
+        .collect();
 
     polyline_to_display_data(&points, color).unwrap()
 }
 
-pub fn polar_conic_arc_to_display_data(arc: &ConicArcInPolar, color: Vec4, slice: u32) -> LineStripDisplayData {
+pub fn polar_conic_arc_to_display_data(
+    arc: &ConicArcInPolar,
+    color: Vec4,
+    slice: u32,
+) -> LineStripDisplayData {
     let deg_step = (2.0 * PI - arc.range.0 + arc.range.1) / slice as Real;
 
     let x_axis = arc.axis;
@@ -332,13 +343,15 @@ pub fn polar_conic_arc_to_display_data(arc: &ConicArcInPolar, color: Vec4, slice
     let cart = Cartesian3D::new(x_axis, normal, z_axis, arc.origin);
 
     let mut deg = arc.range.0;
-    let points: Vec<Vec3> = (0..slice).map(|_| {
-        deg += deg_step;
-        deg = if deg >= PI { deg - 2.0 * PI } else { deg };
-        let l = arc.e * arc.p / (1.0 - arc.e * deg.cos());
-        let point = Vec3::from_xyz(l * deg.cos(), l * deg.sin(), 0.0);
-        cart.transform(point)
-    }).collect();
+    let points: Vec<Vec3> = (0..slice)
+        .map(|_| {
+            deg += deg_step;
+            deg = if deg >= PI { deg - 2.0 * PI } else { deg };
+            let l = arc.e * arc.p / (1.0 - arc.e * deg.cos());
+            let point = Vec3::from_xyz(l * deg.cos(), l * deg.sin(), 0.0);
+            cart.transform(point)
+        })
+        .collect();
 
     polyline_to_display_data(&points, color).unwrap()
 }
