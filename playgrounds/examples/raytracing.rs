@@ -1,7 +1,8 @@
 use geometric::{geom3d::*, intersect3d::ray_sphere_intersect_param};
-use graphics::ppm::PPM;
+use graphics::ppm;
 use math::{matrix::*, precision::Real};
 use rand::Rng;
+use std::{sync::{Arc, mpsc::Sender}, thread};
 
 const CANVA_WIDTH: usize = 200;
 const CANVA_HEIGHT: usize = 100;
@@ -95,11 +96,11 @@ struct HitResult<'a> {
 
 struct Shape {
     sphere: Sphere,
-    scatter: Box<dyn Scattering>,
+    scatter: Box<dyn Scattering + Send + Sync>,
 }
 
 impl Shape {
-    pub fn new(sphere: Sphere, scatter: Box<dyn Scattering>) -> Self {
+    pub fn new(sphere: Sphere, scatter: Box<dyn Scattering + Send + Sync>) -> Self {
         Self { sphere, scatter }
     }
 }
@@ -109,7 +110,7 @@ trait Hitable {
 }
 
 struct World {
-    shapes: Vec<Box<dyn Hitable>>,
+    shapes: Vec<Box<dyn Hitable + Send + Sync>>,
 }
 
 impl World {
@@ -117,7 +118,7 @@ impl World {
         Self { shapes: vec![] }
     }
 
-    pub fn add(&mut self, shape: Box<dyn Hitable>) {
+    pub fn add(&mut self, shape: Box<dyn Hitable + Send + Sync>) {
         self.shapes.push(shape);
     }
 
@@ -172,7 +173,6 @@ const MAX_RECURSE: u32 = 50;
 const SAMPLE_COUNT: u32 = 100;
 
 fn ray_color(ray: &Ray3D, world: &World, count: u32) -> Vec3 {
-    let unit_direction = random_in_unit_sphere();
     if let Some(hit) = world.hit(ray) {
         if count == 0 {
             return Vec3::zeros();
@@ -208,10 +208,41 @@ impl Scattering for Metal {
     }
 }
 
+fn do_raytracing(
+    world: &World,
+    camera: &Camera,
+    mut subarea: ppm::SubArea,
+    sender: Sender<i32>,
+) -> ppm::SubArea {
+    let mut rng = rand::thread_rng();
+    for y in (subarea.min_y()..subarea.max_y()).rev() {
+        for x in 0..subarea.width() {
+            let mut color = Vec3::zeros();
+            for _ in 0..SAMPLE_COUNT {
+                let u = (x as Real + rng.gen_range(0.0..1.0)) / CANVA_WIDTH as Real;
+                let v = ((CANVA_HEIGHT - y - 1) as Real - rng.gen_range(0.0..1.0))
+                    / CANVA_HEIGHT as Real;
+
+                color += ray_color(&camera.get_ray(u, v), &world, MAX_RECURSE);
+            }
+
+            color /= SAMPLE_COUNT as Real;
+            color[0] = color.x().sqrt();
+            color[1] = color.y().sqrt();
+            color[2] = color.z().sqrt();
+
+            subarea.set_pixel(x, y - subarea.min_y(), color);
+            sender.send(1).unwrap();
+        }
+    }
+    sender.send(2).unwrap();
+    subarea
+}
+
 fn main() {
-    let mut ppm = PPM::new(CANVA_WIDTH, CANVA_HEIGHT);
     let mut camera = Camera::new(1.0, 4.0, 2.0);
     camera.move_to(Vec3::from_xyz(0.0, 1.0, 1.0));
+    let camera = Arc::new(camera);
 
     let mut world = World::new();
     world.add(Box::new(Shape::new(
@@ -232,32 +263,59 @@ fn main() {
             color: Vec3::from_xyz(0.8, 0.8, 0.8),
         }),
     )));
+    let world = Arc::new(world);
 
-    let mut rng = rand::thread_rng();
+    let mut threads: Vec<std::thread::JoinHandle<_>> = Vec::new();
 
-    for y in (0..CANVA_HEIGHT).rev() {
-        for x in 0..CANVA_WIDTH {
-            println!(
-                "processing : {}/{}",
-                (CANVA_HEIGHT - y - 1) * CANVA_WIDTH + x,
-                CANVA_WIDTH * CANVA_HEIGHT
-            );
-            let mut color = Vec3::zeros();
-            for _ in 0..SAMPLE_COUNT {
-                let u = (x as Real + rng.gen_range(0.0..1.0)) / CANVA_WIDTH as Real;
-                let v = ((CANVA_HEIGHT - y - 1) as Real - rng.gen_range(0.0..1.0))
-                    / CANVA_HEIGHT as Real;
+    // Change your thread count here
+    // eg: let thread_count = 16
+    let thread_count = thread::available_parallelism().unwrap().into();
 
-                color += ray_color(&camera.get_ray(u, v), &world, MAX_RECURSE);
-            }
 
-            color /= SAMPLE_COUNT as Real;
-            color[0] = color.x().sqrt();
-            color[1] = color.y().sqrt();
-            color[2] = color.z().sqrt();
+    let y_step = CANVA_HEIGHT / thread_count;
+    let (tx, rx) = std::sync::mpsc::channel();
 
-            ppm.set_pixel(x, y, color);
-        }
+    let current_time = std::time::SystemTime::now();
+
+    for i in 0..thread_count {
+        let min_y = i * y_step;
+        let max_y = (i + 1) * y_step;
+        let world = Arc::clone(&world);
+        let camera = Arc::clone(&camera);
+        let subarea = ppm::SubArea::new(CANVA_WIDTH, min_y, max_y);
+        let tx = tx.clone();
+        threads.push(thread::spawn(move || {
+            do_raytracing(
+                &world,
+                &camera,
+                subarea,
+                tx,
+            )
+        }));
     }
+
+    let mut count = 0;
+    let mut finish_count = 0;
+    for i in rx {
+        if i == 1 {
+            count += 1;
+        } else {
+            finish_count += 1;
+        }
+        if finish_count == thread_count {
+            break;
+        }
+        println!("processed pixel: {}/{}", count, thread_count * y_step * CANVA_WIDTH);
+    }
+
+    let mut subareas: Vec<ppm::SubArea> = Vec::with_capacity(thread_count);
+    for thread in threads {
+        subareas.push(thread.join().unwrap());
+    }
+
+    let duration = std::time::SystemTime::now().duration_since(current_time).unwrap();
+    println!("process time = {}s", duration.as_millis() as f64 / 1000.0);
+
+    let ppm = ppm::PPM::from_subareas(subareas);
     ppm.write_to_file("result.ppm").unwrap();
 }
